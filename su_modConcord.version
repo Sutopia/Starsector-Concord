@@ -1,0 +1,11 @@
+{
+    "masterVersionFile":"https://raw.githubusercontent.com/Sutopia/-StarSector-0.95a-Modern-Carrier/main/moderncarrier.version",
+    "modName":"CONCORD",
+    "modThreadId":21569,
+    "modVersion":
+    {
+        "major":1,
+        "minor":0,
+        "patch":"0"
+    }
+}
