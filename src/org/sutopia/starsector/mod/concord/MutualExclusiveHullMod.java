@@ -9,6 +9,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
+import com.fs.starfarer.api.impl.campaign.ids.HullMods;
 
 public abstract class MutualExclusiveHullMod extends BaseHullMod {
 	
@@ -35,6 +36,18 @@ public abstract class MutualExclusiveHullMod extends BaseHullMod {
 						break;
 					}
 				}*/
+			}
+			switch (loadTag) {
+				case Codex.TARGETING_UNIT:
+					result.add(Codex.VANILLA_EXCLUSIVE_PREFIX + HullMods.INTEGRATED_TARGETING_UNIT);
+					result.add(Codex.VANILLA_EXCLUSIVE_PREFIX + HullMods.DEDICATED_TARGETING_CORE);
+					result.add(Codex.VANILLA_EXCLUSIVE_PREFIX + HullMods.ADVANCED_TARGETING_CORE);
+					result.add(Codex.VANILLA_EXCLUSIVE_PREFIX + "supercomputer");
+					break;
+				case Codex.PHASE_MAJOR_MOD:
+					result.add(Codex.VANILLA_EXCLUSIVE_PREFIX + HullMods.PHASE_ANCHOR);
+					result.add(Codex.VANILLA_EXCLUSIVE_PREFIX + HullMods.ADAPTIVE_COILS);
+					break;
 			}
 		}
 		
