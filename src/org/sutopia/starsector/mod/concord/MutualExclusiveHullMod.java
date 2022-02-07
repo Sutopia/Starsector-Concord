@@ -128,18 +128,79 @@ public abstract class MutualExclusiveHullMod extends BaseHullMod {
 		return incompatibleHullMods;
 	}
 	
+	/**
+	 * Returns the all of hullmods (in id) that are incompatible with current hullmod.
+	 */
+	public List<String> getFullIncompatibleIdList() {
+		ArrayList<String> incompatibleHullMods = new ArrayList<String>();
+		
+		for (String hullModIdWithVex: getVanillaMutualExclusiveTags()) {
+			HullModSpecAPI hullMod = Global.getSettings().getHullModSpec(hullModIdWithVex.substring(Codex.VANILLA_EXCLUSIVE_PREFIX.length()));
+			if (hullMod != null) {
+				incompatibleHullMods.add(hullMod.getId());
+			}
+		}
+		
+		for (HullModSpecAPI hullMod: Global.getSettings().getAllHullModSpecs()){
+			if (hullMod.getId() == spec.getId()) {
+				continue;
+			}
+			
+			if (incompatibleHullMods.contains(hullMod.getId())) {
+				continue;
+			}
+			
+			for (String tag: getMutualExclusiveTags()) {
+				if (spec.hasTag(tag) && hullMod.hasTag(tag)) {
+					incompatibleHullMods.add(hullMod.getId());
+					break;
+				}
+			}
+		}
+		return incompatibleHullMods;
+	}
+	
+	/**
+	 * Returns the all of hullmods (in display name) that are incompatible with current ship.
+	 */
+	public HashSet<String> getCurrentIncompatibleList(ShipAPI ship) {
+		HashSet<String> incompatibleHullMods = new HashSet<String>();
+		
+		for (String hullmodId : ship.getVariant().getHullMods()) {
+			HullModSpecAPI hullModSpec = Global.getSettings().getHullModSpec(hullmodId);
+			String displayName = hullModSpec.getDisplayName();
+			if (displayName == null || displayName == "") {
+				continue;
+			}
+			
+			if (getVanillaMutualExclusiveTags().contains(Codex.VANILLA_EXCLUSIVE_PREFIX + hullmodId)){
+				incompatibleHullMods.add(displayName);
+				continue;
+			}
+			
+			for (String tags: hullModSpec.getTags()) {
+				if (getMutualExclusiveTags().contains(tags)){
+					incompatibleHullMods.add(displayName);
+					break;
+				}
+			}
+		}
+		
+		return incompatibleHullMods;
+	}
+	
 	@Override
 	public String getUnapplicableReason(ShipAPI ship) {
 		if (ship == null) return null;
 		
-		List<String> incompatibleHullMods = getIncompatibleList(ship);
+		String[] incompatibleHullMods = getCurrentIncompatibleList(ship).toArray(new String[0]);
 		
 		StringBuilder sb = new StringBuilder();
-		for (int i=0; i<incompatibleHullMods.size(); i++) {
+		for (int i=0; i<incompatibleHullMods.length; i++) {
 			if (i != 0) {
 				sb.append(", ");
 			}
-			sb.append(incompatibleHullMods.get(i));
+			sb.append(incompatibleHullMods[i]);
 		}
 		
 		return "The following hullmods are incompatible with this hullmod:\n" + sb.toString();
