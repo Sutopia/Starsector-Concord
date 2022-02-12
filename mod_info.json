@@ -3,7 +3,7 @@
     "name": "Concord",
     "author": "Sutopia",
     "utility": "false",
-    "version": "1.1.1a",
+    "version": "1.2.0a",
     "description": "Cross mod compatibility",
     "gameVersion": "0.95.1a-RC6",
 	"jars": ["jar/ConcordMod.jar"],

@@ -1,0 +1,2 @@
+name,id,tier,rarity,tech/manufacturer,tags,uiTags,base value,unlocked,hidden,hiddenEverywhere,cost_frigate,cost_dest,cost_cruiser,cost_capital,script,desc,short,sprite
+Incompatible Hullmod,concord_incompatible,,,,,,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.Incompatible,"You installed an incompatible hullmod","Incompatible","graphics/icons/intel/damage.png"

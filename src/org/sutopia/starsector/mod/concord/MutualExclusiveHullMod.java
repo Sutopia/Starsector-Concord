@@ -8,10 +8,17 @@ import java.util.Set;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
 import com.fs.starfarer.api.impl.campaign.ids.HullMods;
 
 public abstract class MutualExclusiveHullMod extends BaseHullMod {
+	
+	public static final String INCOMPATIBLE_REPLACE_HULLMOD = "concord_incompatible";
+	
+	private static boolean isSkipModCheck() {
+		return Global.getSettings().getBoolean("concord_check_mod");
+	}
 	
 	/** 
 	 * Returns the set of mutual exclusive tags (Override for effect)
@@ -69,16 +76,39 @@ public abstract class MutualExclusiveHullMod extends BaseHullMod {
 	public boolean isApplicableToShip(ShipAPI ship) {
 		if (ship == null) return false;
 		
+		// Deal with conflict injection
+		if (ship.getVariant().hasHullMod(spec.getId())) {
+			for (String hullModIdWithVex: getVanillaMutualExclusiveTags()) {
+				String vanillaHullmodId = hullModIdWithVex.substring(Codex.VANILLA_EXCLUSIVE_PREFIX.length());
+				ShipVariantAPI variant = ship.getVariant();
+				if (variant.getNonBuiltInHullmods().size() > 0 && variant.getNonBuiltInHullmods().contains(vanillaHullmodId)) {
+					variant.removeMod(vanillaHullmodId);
+					HullModSpecAPI originalMod = Global.getSettings().getHullModSpec(vanillaHullmodId);
+					HullModSpecAPI newMod = Global.getSettings().getHullModSpec(INCOMPATIBLE_REPLACE_HULLMOD);
+					newMod.setDisplayName(originalMod.getDisplayName() + " (Incompatible)");
+					newMod.setSpriteName(originalMod.getSpriteName());
+					variant.addMod(INCOMPATIBLE_REPLACE_HULLMOD);
+				}
+			}
+		}
+		
 		for (String hullModIdWithVex: getVanillaMutualExclusiveTags()) {
 			if (ship.getVariant().hasHullMod(hullModIdWithVex.substring(Codex.VANILLA_EXCLUSIVE_PREFIX.length()))) {
-				
 				return false;
 			}
 		}
 		
-		for (String tag: getMutualExclusiveTags()) {
-			if (spec.hasTag(tag) && shipHasOtherModInCategory(ship, spec.getId(), tag)) {
-				return false;
+		if (isSkipModCheck()) {
+			for (String tag: getMutualExclusiveTags()) {
+				if (spec.hasTag(tag) && shipHasOtherModInCategory(ship, spec.getId(), tag)) {
+					return false;
+				}
+			}
+		} else {
+			for (String tag: getCustomMutualExclusiveTags()) {
+				if (spec.hasTag(tag) && shipHasOtherModInCategory(ship, spec.getId(), tag)) {
+					return false;
+				}
 			}
 		}
 		
