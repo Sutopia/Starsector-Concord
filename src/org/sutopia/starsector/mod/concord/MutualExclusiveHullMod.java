@@ -73,23 +73,31 @@ public abstract class MutualExclusiveHullMod extends BaseHullMod {
 	}
 	
 	@Override
+	public void applyEffectsAfterShipCreation(ShipAPI ship, String id) {
+		for (String hullModIdWithVex: getVanillaMutualExclusiveTags()) {
+			String vanillaHullmodId = hullModIdWithVex.substring(Codex.VANILLA_EXCLUSIVE_PREFIX.length());
+			ShipVariantAPI variant = ship.getVariant();
+			if (variant.getNonBuiltInHullmods().size() > 0 && variant.getNonBuiltInHullmods().contains(vanillaHullmodId)) {
+				variant.removeMod(vanillaHullmodId);
+				HullModSpecAPI originalMod = Global.getSettings().getHullModSpec(vanillaHullmodId);
+				HullModSpecAPI newMod = Global.getSettings().getHullModSpec(INCOMPATIBLE_REPLACE_HULLMOD);
+				newMod.setDisplayName(originalMod.getDisplayName() + " (Incompatible)");
+				newMod.setSpriteName(originalMod.getSpriteName());
+				Incompatible.HULLMOD_ONE = spec.getDisplayName();
+				Incompatible.HULLMOD_TWO = originalMod.getDisplayName();
+				newMod.setDescriptionFormat("%s is incompatible with %s");
+				variant.addMod(INCOMPATIBLE_REPLACE_HULLMOD);
+			}
+		}
+	}
+	
+	@Override
 	public boolean isApplicableToShip(ShipAPI ship) {
 		if (ship == null) return false;
 		
 		// Deal with conflict injection
 		if (ship.getVariant().hasHullMod(spec.getId())) {
-			for (String hullModIdWithVex: getVanillaMutualExclusiveTags()) {
-				String vanillaHullmodId = hullModIdWithVex.substring(Codex.VANILLA_EXCLUSIVE_PREFIX.length());
-				ShipVariantAPI variant = ship.getVariant();
-				if (variant.getNonBuiltInHullmods().size() > 0 && variant.getNonBuiltInHullmods().contains(vanillaHullmodId)) {
-					variant.removeMod(vanillaHullmodId);
-					HullModSpecAPI originalMod = Global.getSettings().getHullModSpec(vanillaHullmodId);
-					HullModSpecAPI newMod = Global.getSettings().getHullModSpec(INCOMPATIBLE_REPLACE_HULLMOD);
-					newMod.setDisplayName(originalMod.getDisplayName() + " (Incompatible)");
-					newMod.setSpriteName(originalMod.getSpriteName());
-					variant.addMod(INCOMPATIBLE_REPLACE_HULLMOD);
-				}
-			}
+			return true;
 		}
 		
 		for (String hullModIdWithVex: getVanillaMutualExclusiveTags()) {
