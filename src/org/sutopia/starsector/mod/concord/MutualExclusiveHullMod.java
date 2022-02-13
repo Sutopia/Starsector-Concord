@@ -80,12 +80,21 @@ public abstract class MutualExclusiveHullMod extends BaseHullMod {
 			if (variant.getNonBuiltInHullmods().size() > 0 && variant.getNonBuiltInHullmods().contains(vanillaHullmodId)) {
 				variant.removeMod(vanillaHullmodId);
 				HullModSpecAPI originalMod = Global.getSettings().getHullModSpec(vanillaHullmodId);
+				
 				HullModSpecAPI newMod = Global.getSettings().getHullModSpec(INCOMPATIBLE_REPLACE_HULLMOD);
 				newMod.setDisplayName(originalMod.getDisplayName() + " (Incompatible)");
 				newMod.setSpriteName(originalMod.getSpriteName());
-				Incompatible.HULLMOD_ONE = spec.getDisplayName();
-				Incompatible.HULLMOD_TWO = originalMod.getDisplayName();
-				newMod.setDescriptionFormat("%s is incompatible with %s");
+				newMod.setFrigateCost(originalMod.getFrigateCost());
+				newMod.setDestroyerCost(originalMod.getDestroyerCost());
+				newMod.setCruiserCost(originalMod.getCruiserCost());
+				newMod.setCapitalCost(originalMod.getCapitalCost());
+				
+				Incompatible.HULLMOD_ONE = spec.getId();
+				Incompatible.HULLMOD_TWO = originalMod.getId();
+				newMod.setDescriptionFormat(
+						"%s is incompatible with %s.\n\n" + 
+						"This hullmod currently has no effect.");
+				
 				variant.addMod(INCOMPATIBLE_REPLACE_HULLMOD);
 			}
 		}
