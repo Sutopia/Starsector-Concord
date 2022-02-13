@@ -79,23 +79,9 @@ public abstract class MutualExclusiveHullMod extends BaseHullMod {
 			ShipVariantAPI variant = ship.getVariant();
 			if (variant.getNonBuiltInHullmods().size() > 0 && variant.getNonBuiltInHullmods().contains(vanillaHullmodId)) {
 				variant.removeMod(vanillaHullmodId);
-				HullModSpecAPI originalMod = Global.getSettings().getHullModSpec(vanillaHullmodId);
-				
-				HullModSpecAPI newMod = Global.getSettings().getHullModSpec(INCOMPATIBLE_REPLACE_HULLMOD);
-				newMod.setDisplayName(originalMod.getDisplayName() + " (Incompatible)");
-				newMod.setSpriteName(originalMod.getSpriteName());
-				newMod.setFrigateCost(originalMod.getFrigateCost());
-				newMod.setDestroyerCost(originalMod.getDestroyerCost());
-				newMod.setCruiserCost(originalMod.getCruiserCost());
-				newMod.setCapitalCost(originalMod.getCapitalCost());
-				
-				Incompatible.HULLMOD_ONE = spec.getId();
-				Incompatible.HULLMOD_TWO = originalMod.getId();
-				newMod.setDescriptionFormat(
-						"%s is incompatible with %s.\n\n" + 
-						"This hullmod currently has no effect.");
-				
+				Incompatible.addIncompatible(variant.getHullVariantId(), vanillaHullmodId, spec.getId());
 				variant.addMod(INCOMPATIBLE_REPLACE_HULLMOD);
+				//TODO: Over-engineer the shit out of this and make incompatible manager in Incompatible
 			}
 		}
 	}
