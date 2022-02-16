@@ -14,7 +14,7 @@ import com.fs.starfarer.api.impl.campaign.ids.HullMods;
 
 public abstract class MutualExclusiveHullMod extends BaseHullMod {
 	
-	public static final String INCOMPATIBLE_REPLACE_HULLMOD = "concord_incompatible";
+    public static final String INCOMPATIBLE_REPLACE_HULLMOD = "concord_incompatible";
 	
 	private static boolean isSkipModCheck() {
 		return Global.getSettings().getBoolean("concord_check_mod");
