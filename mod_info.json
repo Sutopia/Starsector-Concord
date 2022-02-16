@@ -3,8 +3,9 @@
     "name": "Concord",
     "author": "Sutopia",
     "utility": "false",
-    "version": "1.4.0a",
+    "version": "2.0.0a",
     "description": "Cross mod compatibility",
     "gameVersion": "0.95.1a-RC6",
 	"jars": ["jar/ConcordMod.jar"],
+	"modPlugin": "org.sutopia.starsector.mod.concord.adv.ConcordAssembly",
 }
