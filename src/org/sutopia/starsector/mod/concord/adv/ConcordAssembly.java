@@ -73,17 +73,14 @@ public final class ConcordAssembly extends BaseModPlugin {
                 //swap
                 String id = original.getId();
                 DataEnactDomain.sanctuary.put(id, original.getEffect());
-                //original.setId(Codex.ID_PREFIX_CONCORD_DOPPELGANGER + id);
-                //original.setHidden(true);
+                spec.setId(id);
                 original.addTag(Codex.TAG_CONCORD_CUSTODY);
                 if (original.isHidden()) {
                     original.addTag(Codex.TAG_CONCORD_HIDDEN);
+                } else {
+                    ConcordCaptain.doppelgangers.add(spec);
+                    ConcordCaptain.specs.add(original);
                 }
-                spec.setId(id);
-                //Global.getSettings().putSpec(original.getClass(), id, spec);
-                //Global.getSettings().putSpec(original.getClass(), Codex.ID_PREFIX_CONCORD_DOPPELGANGER + id, original);
-                ConcordCaptain.doppelgangers.add(spec);
-                ConcordCaptain.specs.add(original);
             }
         }
         
