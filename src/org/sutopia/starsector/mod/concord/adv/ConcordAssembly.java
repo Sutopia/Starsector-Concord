@@ -9,6 +9,7 @@ import org.sutopia.starsector.mod.concord.Codex;
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
@@ -155,21 +156,37 @@ public final class ConcordAssembly extends BaseModPlugin {
         }
         
         // Shell for S-Mod display correction
-        Global.setSettings(new ConcordSettings(Global.getSettings()));
+        //Global.setSettings(new ConcordSettings(Global.getSettings()));
     }
+    
+    private static boolean initialized = false;
     
     @Override
     public void onGameLoad(boolean newGame) {
-        CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
-        if (fleet == null) {
-            return;
+        if (!initialized) {
+            Global.setSettings(new ConcordSettings(Global.getSettings()));
+            initialized = true;
         }
-        for (FleetMemberAPI member : fleet.getFleetData().getMembersListCopy()) {
-            ShipVariantAPI variant = member.getVariant();
-            if (!variant.hasHullMod("concord_captain")) {
-                variant.addPermaMod("concord_captain", false);
+        
+        CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
+        if (fleet != null) {
+            for (FleetMemberAPI member : fleet.getFleetData().getMembersListCopy()) {
+                ShipVariantAPI variant = member.getVariant();
+                if (!variant.hasHullMod("concord_captain")) {
+                    variant.addPermaMod("concord_captain", false);
+                }
             }
         }
+        
+        FactionAPI player = Global.getSector().getPlayerFaction();
+        for (HullModSpecAPI spec : ConcordCaptain.specs) {
+            String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
+            if (player.knowsHullMod(spec.getId()) 
+                    && !player.knowsHullMod(doppelganger)) {
+                player.addKnownHullMod(doppelganger);
+            }
+        }
+        
         Global.getSector().addTransientScript(new ConcordCommander());
     }
 }

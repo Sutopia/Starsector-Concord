@@ -28,6 +28,15 @@ public class ConcordSettings extends BaseSettingsAPI {
                         return false;
                     }
                 };
+            } else if (callerMethod == "execute" && trace.getClassName() == "PSM_BuildInHullMod") {
+                if (ConcordCaptain.doppelgangers.contains(real)) {
+                    return new MutableHullModSpec(real) {
+                        @Override
+                        public boolean isHidden() {
+                            return true;
+                        }
+                    };
+                }
             }
         }
         
