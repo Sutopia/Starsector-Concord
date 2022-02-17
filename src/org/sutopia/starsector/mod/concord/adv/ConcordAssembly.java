@@ -18,9 +18,17 @@ public final class ConcordAssembly extends BaseModPlugin {
     
     @Override
     public void onApplicationLoad() throws Exception {
+        
         for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
             if (!spec.isBuiltInMod("concord_captain")) {
                 spec.addBuiltInMod("concord_captain");
+            }
+        }
+        
+        for (String id : Global.getSettings().getAllVariantIds()) {
+            ShipVariantAPI variant = Global.getSettings().getVariant(id);
+            if (!variant.hasHullMod("concord_captain")) {
+                variant.addPermaMod("concord_captain", false);
             }
         }
         
@@ -74,6 +82,8 @@ public final class ConcordAssembly extends BaseModPlugin {
                 spec.setId(id);
                 //Global.getSettings().putSpec(original.getClass(), id, spec);
                 //Global.getSettings().putSpec(original.getClass(), Codex.ID_PREFIX_CONCORD_DOPPELGANGER + id, original);
+                ConcordCaptain.doppelgangers.add(spec);
+                ConcordCaptain.specs.add(original);
             }
         }
         
@@ -131,6 +141,24 @@ public final class ConcordAssembly extends BaseModPlugin {
                 spec.addTag(tag);
             }
         }
+        
+        // populate neutral
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            for (String tag : spec.getTags()) {
+                if (tag.startsWith(Codex.NEUTRAL_EXCLUSIVE_PREFIX)) {
+                    String target = tag.substring(Codex.NEUTRAL_EXCLUSIVE_PREFIX.length());
+                    HashSet<String> neutList = DataEnactDomain.neutralBlackList.get(target);
+                    if (neutList == null) {
+                        neutList = new HashSet<String>();
+                        DataEnactDomain.neutralBlackList.put(target, neutList);
+                    }
+                    neutList.add(spec.getId());
+                }
+            }
+        }
+        
+        // Shell for S-Mod display correction
+        Global.setSettings(new ConcordSettings(Global.getSettings()));
     }
     
     @Override
