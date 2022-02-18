@@ -156,17 +156,12 @@ public final class ConcordAssembly extends BaseModPlugin {
         }
         
         // Shell for S-Mod display correction
-        //Global.setSettings(new ConcordSettings(Global.getSettings()));
+        Global.setSettings(new ConcordSettings(Global.getSettings()));
     }
     
-    private static boolean initialized = false;
     
     @Override
     public void onGameLoad(boolean newGame) {
-        if (!initialized) {
-            Global.setSettings(new ConcordSettings(Global.getSettings()));
-            initialized = true;
-        }
         
         CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
         if (fleet != null) {

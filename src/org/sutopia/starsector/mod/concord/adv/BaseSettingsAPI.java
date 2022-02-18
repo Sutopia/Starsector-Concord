@@ -219,7 +219,7 @@ public class BaseSettingsAPI implements SettingsAPI {
 
     @Override
     public void loadTexture(String filename) throws IOException {
-        vanilla.loadText(filename);
+        vanilla.loadTexture(filename);
     }
 
     @Override
