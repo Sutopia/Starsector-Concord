@@ -1,26 +1,27 @@
 name,id,tier,rarity,tech/manufacturer,tags,uiTags,base value,unlocked,hidden,hiddenEverywhere,cost_frigate,cost_dest,cost_cruiser,cost_capital,script,desc,short,sprite
+,,,,,,,,,,,,,,,,,,
 Incompatible Hullmod,concord_incompatible,,,,,,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.Incompatible,"You installed an incompatible hullmod","Incompatible","graphics/icons/intel/damage.png"
 Concord Captain,concord_captain,,,,,,0,,TRUE,TRUE,0,0,0,0,org.sutopia.starsector.mod.concord.adv.ConcordCaptain,"Peekaboo","Captain","graphics/icons/intel/damage.png"
-
+,,,,,,,,,,,,,,,,,,
 ,concord_dedicated_targeting_core,0,,,"auto_concord, vEx_targeting_unit",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_targetingunit,0,,,"auto_concord, vEx_targeting_unit",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_advancedcore,0,,,"auto_concord, vEx_targeting_unit",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_supercomputer,0,,,"auto_concord, vEx_targeting_unit",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 ,concord_advancedoptics,0,,,"auto_concord, vEx_beam_style",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_high_scatter_amp,0,,,"auto_concord, vEx_beam_style",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 ,concord_phase_anchor,0,,,"auto_concord, vEx_phase_style",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_adaptive_coils,0,,,"auto_concord, vEx_phase_style",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 ,concord_reinforcedhull,0,,,"auto_concord, vEx_hull_configuration",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_vastbulk,0,,,"auto_concord, vEx_hull_configuration",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 ,concord_axialrotation,0,,,"auto_concord, vEx_forced_rotation",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_anchorrotation,0,,,"auto_concord, vEx_forced_rotation",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 ,concord_do_not_back_off,0,,,"auto_concord, vEx_ai_flag",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 ,concord_safetyoverrides,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_turretgyros,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_armoredweapons,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
@@ -54,7 +55,7 @@ Concord Captain,concord_captain,,,,,,0,,TRUE,TRUE,0,0,0,0,org.sutopia.starsector
 ,concord_fluxbreakers,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_stabilizedshieldemitter,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_unstable_injector,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 ,concord_additional_berthing,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_augmentedengines,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_auxiliary_fuel_tanks,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
@@ -65,7 +66,7 @@ Concord Captain,concord_captain,,,,,,0,,TRUE,TRUE,0,0,0,0,org.sutopia.starsector
 ,concord_militarized_subsystems,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_solar_shielding,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_surveying_equipment,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 ,concord_repair_gantry,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_phasefield,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_fluxshunt,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
@@ -79,10 +80,10 @@ Concord Captain,concord_captain,,,,,,0,,TRUE,TRUE,0,0,0,0,org.sutopia.starsector
 ,concord_automated,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_ex_phase_coils,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_converted_bay,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 ,concord_reduced_explosion,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_always_detaches,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_never_detaches,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_no_weapon_flux,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-
+,,,,,,,,,,,,,,,,,,
 
