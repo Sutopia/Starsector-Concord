@@ -236,6 +236,6 @@ public abstract class MutualExclusiveHullMod extends BaseHullMod {
 			sb.append(incompatibleHullMods[i]);
 		}
 		
-		return "The following hullmods are incompatible with this hullmod:\n" + sb.toString();
+		return Global.getSettings().getString(Codex.CONCORD_STRING_CAT, "incompatible_description") + sb.toString();
 	}
 }

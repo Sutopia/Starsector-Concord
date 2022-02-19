@@ -27,12 +27,22 @@ public final class DataEnactDomain implements HullModEffect {
     public static final HashMap<String, HashMap<String, HashSet<String>>> innerCircle = new HashMap<>();
     public static final HashMap<String, HashSet<String>> neutralBlackList = new HashMap<>();
     
+    private static final HashMap<String, HashSet<String>> cachedBlackList = new HashMap<>();
+    
     private String getId() {
         return spec.getId();
     }
     
+    public static void resetCache() {
+        cachedBlackList.clear();
+    }
+    
     private Set<String> getBlackList() {
-        HashSet<String> blackList = new HashSet<>();
+        HashSet<String> blackList = cachedBlackList.get(getId());
+        if (blackList != null) {
+            return blackList;
+        }
+        blackList = new HashSet<>();
         Set<String> allTags = spec.getTags();
         
         for (String tag: allTags) {
@@ -79,7 +89,7 @@ public final class DataEnactDomain implements HullModEffect {
                 }
             }
         }
-        
+        cachedBlackList.put(getId(), blackList);
         return blackList;
     }
 
@@ -151,7 +161,7 @@ public final class DataEnactDomain implements HullModEffect {
                 }
             }
         }
-        return "The following hullmods are incompatible with this hullmod:\n" + sb.toString();
+        return Global.getSettings().getString(Codex.CONCORD_STRING_CAT, "incompatible_description") + sb.toString();
     }
 
     @Override

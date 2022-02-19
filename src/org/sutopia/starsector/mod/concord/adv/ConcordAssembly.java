@@ -182,6 +182,6 @@ public final class ConcordAssembly extends BaseModPlugin {
             }
         }
         
-        Global.getSector().addTransientScript(new ConcordCommander());
+        //Global.getSector().addTransientScript(new ConcordCommander());
     }
 }

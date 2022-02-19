@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.sutopia.starsector.mod.concord.Codex;
 import org.sutopia.starsector.mod.concord.api.OnInstallHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.OnRemoveHullmodEffect;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
@@ -70,7 +72,17 @@ public class ConcordCaptain extends BaseHullMod {
         if (ship == null) {
             return;
         }
+        FactionAPI player = Global.getSector().getPlayerFaction();
+        if (player == null) {
+            return;
+        }
+        
         for (HullModSpecAPI spec: specs) {
+            String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
+            if (player.knowsHullMod(spec.getId()) 
+                    && !player.knowsHullMod(doppelganger)) {
+                player.addKnownHullMod(doppelganger);
+            }
             spec.setHidden(!ship.getVariant().hasHullMod(spec.getId()));
         }
         

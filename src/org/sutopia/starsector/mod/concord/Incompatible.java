@@ -81,8 +81,7 @@ public final class Incompatible extends BaseHullMod {
             newMod.setDestroyerCost(Math.max(newMod.getDestroyerCost(), originalMod.getDestroyerCost()));
             newMod.setCruiserCost(Math.max(newMod.getCruiserCost(), originalMod.getCruiserCost()));
             newMod.setCapitalCost(Math.max(newMod.getCapitalCost(), originalMod.getCapitalCost()));
-            newMod.setDescriptionFormat("This hullmod currently has no effect due to incompatible hull modifications.\n\n"
-                    + "%s is incompatible with:\n%s");
+            newMod.setDescriptionFormat(Global.getSettings().getString(Codex.CONCORD_STRING_CAT, "incompatible_reason"));
         }
     }
 

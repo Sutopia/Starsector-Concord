@@ -11,6 +11,8 @@ public class Codex {
     public static final String TAG_CONCORD_CUSTODY = "custody_by_concord";
     public static final String TAG_CONCORD_HIDDEN = "concord_immutable";
     
+    public static final String CONCORD_STRING_CAT = "su_Concord";
+    
     // topic leader tag
     public static final String VOLATILE_EXCLUSIVE_PREFIX = "vEx_";
     // leader follower tag
