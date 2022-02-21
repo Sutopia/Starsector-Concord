@@ -37,13 +37,6 @@ public final class ConcordAssembly extends BaseModPlugin {
             }
         }
         
-        // register tracked hullmods
-        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
-            if (spec.getEffect() instanceof TrackedHullmodEffect) {
-                ConcordCaptain.trackedHullmods.put(spec.getId(), spec.getEffect());
-            }
-        }
-        
         // create doppelganger
         for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
             if (spec.hasTag(Codex.TAG_CONCORD_OPT_IN) 
@@ -168,11 +161,13 @@ public final class ConcordAssembly extends BaseModPlugin {
             if (spec.hasTag(Codex.TAG_CONCORD_OPT_IN) && spec.getEffect() instanceof DataEnactDomain) {
                 
                 if (!((DataEnactDomain) spec.getEffect()).getBlackList().isEmpty()) {
-                    ConcordSettings.needMock.add(spec.getId());
-                    
-                    ConcordCaptain.doppelgangers.add(spec);
-                    
-                    ConcordCaptain.specs.add(Global.getSettings().getHullModSpec(spec.getId()));
+                    if (!Global.getSettings().getHullModSpec(spec.getId()).isHidden()) {
+                        ConcordSettings.needMock.add(spec.getId());
+                        
+                        ConcordCaptain.doppelgangers.add(spec);
+                        
+                        ConcordCaptain.specs.add(Global.getSettings().getHullModSpec(spec.getId()));
+                    }
                 }
             }
         }
@@ -245,6 +240,13 @@ public final class ConcordAssembly extends BaseModPlugin {
             if (player.knowsHullMod(spec.getId()) 
                     && !player.knowsHullMod(doppelganger)) {
                 player.addKnownHullMod(doppelganger);
+            }
+        }
+        
+        // register tracked hullmods
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            if (spec.getEffect() instanceof TrackedHullmodEffect) {
+                ConcordCaptain.trackedHullmods.put(spec.getId(), spec.getEffect());
             }
         }
         
