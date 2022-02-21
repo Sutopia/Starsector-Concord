@@ -5,15 +5,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.sutopia.starsector.mod.concord.Codex;
+import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
+import org.sutopia.starsector.mod.concord.dynamic.MutableShipSystemSpecAPI;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
+import com.fs.starfarer.api.combat.ShipSystemSpecAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
+import com.fs.starfarer.api.plugins.ShipSystemStatsScript;
 
 public final class ConcordAssembly extends BaseModPlugin {
     
@@ -21,15 +25,22 @@ public final class ConcordAssembly extends BaseModPlugin {
     public void onApplicationLoad() throws Exception {
         
         for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
-            if (!spec.isBuiltInMod("concord_captain")) {
-                spec.addBuiltInMod("concord_captain");
+            if (!spec.isBuiltInMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID)) {
+                spec.addBuiltInMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID);
             }
         }
         
         for (String id : Global.getSettings().getAllVariantIds()) {
             ShipVariantAPI variant = Global.getSettings().getVariant(id);
-            if (!variant.hasHullMod("concord_captain")) {
-                variant.addPermaMod("concord_captain", false);
+            if (!variant.hasHullMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID)) {
+                variant.addPermaMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID, false);
+            }
+        }
+        
+        // register tracked hullmods
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            if (spec.getEffect() instanceof TrackedHullmodEffect) {
+                ConcordCaptain.trackedHullmods.put(spec.getId(), spec.getEffect());
             }
         }
         
@@ -78,9 +89,6 @@ public final class ConcordAssembly extends BaseModPlugin {
                 original.addTag(Codex.TAG_CONCORD_CUSTODY);
                 if (original.isHidden()) {
                     original.addTag(Codex.TAG_CONCORD_HIDDEN);
-                } else {
-                    ConcordCaptain.doppelgangers.add(spec);
-                    ConcordCaptain.specs.add(original);
                 }
             }
         }
@@ -155,10 +163,68 @@ public final class ConcordAssembly extends BaseModPlugin {
             }
         }
         
+        // cache need mock
+        for (HullModSpecAPI spec: Global.getSettings().getAllHullModSpecs()) {
+            if (spec.hasTag(Codex.TAG_CONCORD_OPT_IN) && spec.getEffect() instanceof DataEnactDomain) {
+                
+                if (!((DataEnactDomain) spec.getEffect()).getBlackList().isEmpty()) {
+                    ConcordSettings.needMock.add(spec.getId());
+                    
+                    ConcordCaptain.doppelgangers.add(spec);
+                    
+                    ConcordCaptain.specs.add(Global.getSettings().getHullModSpec(spec.getId()));
+                }
+            }
+        }
+        
+        // override cloak script
+        final ShipSystemSpecAPI concordPhase = Global.getSettings().getShipSystemSpec("concord_mod_phasecloak");
+        ShipSystemSpecAPI vanillaPhase = Global.getSettings().getShipSystemSpec("phasecloak");
+        HashSet<String> phaseSystems = new HashSet<>();
+        for (ShipSystemSpecAPI spec : Global.getSettings().getAllShipSystemSpecs()) {
+            if (vanillaPhase.getStatsScriptClassName().equals(spec.getStatsScriptClassName())) {
+                MutableShipSystemSpecAPI concordSpec = new MutableShipSystemSpecAPI(spec) {
+                    private String id;
+                    @Override
+                    public String getId() {
+                        return id;
+                    }
+                    @Override
+                    public void setId(String id) {
+                        this.id = id;
+                    }
+                    @Override
+                    public String getStatsScriptClassName() {
+                        return concordPhase.getStatsScriptClassName();
+                    }
+                    @Override
+                    public ShipSystemStatsScript getStatsScript() {
+                        return concordPhase.getStatsScript();
+                    }
+                };
+                phaseSystems.add(spec.getId());
+                if (!vanillaPhase.getId().equals(spec.getId())) {
+                    Global.getSettings().putSpec(spec.getClass()
+                            , Codex.CONCORD_PHASE_SYSTEM_GEN_PREFIX + spec.getId()
+                            , concordSpec);
+                }
+            }
+        }
+        
+        for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
+            if (phaseSystems.contains(spec.getShipSystemId())) {
+                spec.setShipSystemId(Codex.CONCORD_PHASE_SYSTEM_GEN_PREFIX + spec.getShipSystemId());
+            }
+            if (phaseSystems.contains(spec.getShipDefenseId())) {
+                spec.setShipDefenseId(Codex.CONCORD_PHASE_SYSTEM_GEN_PREFIX + spec.getShipDefenseId());
+            }
+        }
+        
         // Shell for S-Mod display correction
         Global.setSettings(new ConcordSettings(Global.getSettings()));
+        DataEnactDomain.resetCache();
+        // throw new RuntimeException(ConcordCaptain.specs.size() + "");
     }
-    
     
     @Override
     public void onGameLoad(boolean newGame) {
@@ -167,8 +233,8 @@ public final class ConcordAssembly extends BaseModPlugin {
         if (fleet != null) {
             for (FleetMemberAPI member : fleet.getFleetData().getMembersListCopy()) {
                 ShipVariantAPI variant = member.getVariant();
-                if (!variant.hasHullMod("concord_captain")) {
-                    variant.addPermaMod("concord_captain", false);
+                if (!variant.hasHullMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID)) {
+                    variant.addPermaMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID, false);
                 }
             }
         }

@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.json.JSONException;
 import org.json.JSONObject;
-import org.sutopia.starsector.mod.concord.MutableSpecAPI;
 
 import com.fs.starfarer.api.combat.DamageType;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
@@ -14,16 +14,19 @@ import com.fs.starfarer.api.combat.ShipSystemSpecAPI;
 import com.fs.starfarer.api.combat.WeaponAPI.WeaponType;
 import com.fs.starfarer.api.plugins.ShipSystemStatsScript;
 
-public abstract class MutableShipSystemSpecAPI extends MutableSpecAPI<ShipSystemSpecAPI> implements ShipSystemSpecAPI {
-
-    public MutableShipSystemSpecAPI(ShipSystemSpecAPI source) {
-        super(source);
+public abstract class MutableShipSystemSpecAPI extends com.fs.starfarer.loading.specs.oO0O {
+    
+    protected ShipSystemSpecAPI original;
+    
+    public MutableShipSystemSpecAPI(ShipSystemSpecAPI source) throws JSONException {
+        super(source.getSpecJson());
+        this.original = source;
     }
     
     public String getOriginalId() {
         return original.getId();
     }
-
+    
     public String getIconSpriteName() {
         return original.getIconSpriteName();
     }

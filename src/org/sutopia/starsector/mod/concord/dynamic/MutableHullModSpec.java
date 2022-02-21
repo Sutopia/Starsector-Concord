@@ -2,17 +2,17 @@ package org.sutopia.starsector.mod.concord.dynamic;
 
 import java.util.Set;
 
-import org.sutopia.starsector.mod.concord.MutableSpecAPI;
-
 import com.fs.starfarer.api.combat.HullModEffect;
 import com.fs.starfarer.api.combat.HullModFleetEffect;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
 
-public abstract class MutableHullModSpec extends MutableSpecAPI<HullModSpecAPI> implements HullModSpecAPI {
-
+public abstract class MutableHullModSpec implements HullModSpecAPI {
+    
+    protected final HullModSpecAPI original;
+    
     public MutableHullModSpec(HullModSpecAPI source) {
-        super(source);
+        this.original = source;
     }
     
     public String getOriginalId() {

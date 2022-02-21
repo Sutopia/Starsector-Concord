@@ -6,21 +6,24 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.sutopia.starsector.mod.concord.Codex;
-import org.sutopia.starsector.mod.concord.api.OnInstallHullmodEffect;
-import org.sutopia.starsector.mod.concord.api.OnRemoveHullmodEffect;
+import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.combat.BaseHullMod;
+import com.fs.starfarer.api.combat.HullModEffect;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
 
 public class ConcordCaptain extends BaseHullMod {
     public static final ArrayList<HullModSpecAPI> doppelgangers = new ArrayList<>();
     public static final ArrayList<HullModSpecAPI> specs = new ArrayList<>();
+    
+    public static final HashMap<String, HullModEffect> trackedHullmods = new HashMap<>();
 
     private static final HashMap<String, HashSet<String>> installMemory = new HashMap<>();
     
+    @SuppressWarnings("deprecation")
     @Override
     public void applyEffectsAfterShipCreation(ShipAPI ship, String id) {
         if (ship == null) {
@@ -28,13 +31,14 @@ public class ConcordCaptain extends BaseHullMod {
         }
         syncHidden(ship);
         
-        ArrayList<OnRemoveHullmodEffect> removeEffects = new ArrayList<>();
-        ArrayList<OnInstallHullmodEffect> installEffects = new ArrayList<>();
+        ArrayList<TrackedHullmodEffect> removeEffects = new ArrayList<>();
+        ArrayList<TrackedHullmodEffect> installEffects = new ArrayList<>();
         
         HashSet<String> installed = installMemory.get(ship.getVariant().getHullVariantId());
         if (installed == null) { // init
             installed = new HashSet<String>();
             installed.addAll(ship.getVariant().getHullMods());
+            installed.retainAll(trackedHullmods.keySet());
             installMemory.put(ship.getVariant().getHullVariantId(), installed);
         }
         
@@ -42,28 +46,22 @@ public class ConcordCaptain extends BaseHullMod {
         while (iter.hasNext()) {
             String hullmod = iter.next();
             if (!ship.getVariant().hasHullMod(hullmod)) {
-                HullModSpecAPI spec = Global.getSettings().getHullModSpec(hullmod);
-                if (spec != null && spec.getEffect() instanceof OnRemoveHullmodEffect) {
-                    removeEffects.add((OnRemoveHullmodEffect) spec.getEffect());
-                }
+                removeEffects.add((TrackedHullmodEffect) trackedHullmods.get(hullmod));
                 iter.remove();
             }
         }
         
-        for (String hullmod : ship.getVariant().getHullMods()) {
-            HullModSpecAPI spec = Global.getSettings().getHullModSpec(hullmod);
-            if (spec != null) {
-                if (!installed.contains(hullmod) && spec.getEffect() instanceof OnInstallHullmodEffect) {
-                    installEffects.add((OnInstallHullmodEffect) spec.getEffect());
-                }
+        for (String hullmod : trackedHullmods.keySet()) {
+            if (ship.getVariant().hasHullMod(hullmod) && !installed.contains(hullmod)) {
                 installed.add(hullmod);
+                installEffects.add((TrackedHullmodEffect) trackedHullmods.get(hullmod));
             }
         }
         
-        for (OnRemoveHullmodEffect effect : removeEffects) {
+        for (TrackedHullmodEffect effect : removeEffects) {
             effect.onRemove(ship);
         }
-        for (OnInstallHullmodEffect effect : installEffects) {
+        for (TrackedHullmodEffect effect : installEffects) {
             effect.onInstall(ship);
         }
     }

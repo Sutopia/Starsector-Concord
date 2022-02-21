@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.sutopia.starsector.mod.concord.Codex;
@@ -15,11 +16,11 @@ import com.fs.starfarer.api.combat.HullModEffect;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
+import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
-@SuppressWarnings("unused")
 public final class DataEnactDomain implements HullModEffect {
     // <id, effect>
     public static final HashMap<String, HullModEffect> sanctuary = new HashMap<>();
@@ -27,7 +28,7 @@ public final class DataEnactDomain implements HullModEffect {
     public static final HashMap<String, HashMap<String, HashSet<String>>> innerCircle = new HashMap<>();
     public static final HashMap<String, HashSet<String>> neutralBlackList = new HashMap<>();
     
-    private static final HashMap<String, HashSet<String>> cachedBlackList = new HashMap<>();
+    private static final HashMap<String, ArrayList<String>> cachedBlackList = new HashMap<>();
     
     private String getId() {
         return spec.getId();
@@ -37,12 +38,12 @@ public final class DataEnactDomain implements HullModEffect {
         cachedBlackList.clear();
     }
     
-    private Set<String> getBlackList() {
-        HashSet<String> blackList = cachedBlackList.get(getId());
+    public List<String> getBlackList() {
+        ArrayList<String> blackList = cachedBlackList.get(getId());
         if (blackList != null) {
             return blackList;
         }
-        blackList = new HashSet<>();
+        blackList = new ArrayList<>();
         Set<String> allTags = spec.getTags();
         
         for (String tag: allTags) {
@@ -103,6 +104,21 @@ public final class DataEnactDomain implements HullModEffect {
     @Override
     public void applyEffectsBeforeShipCreation(HullSize hullSize, MutableShipStatsAPI stats, String id) {
         sanctuary.get(getId()).applyEffectsBeforeShipCreation(hullSize, stats, getId());
+        // defensive re-install
+        String dId = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + getId();
+        ShipVariantAPI variant = stats.getVariant();
+        if (variant.hasHullMod(dId)) {
+            if (variant.getSMods().contains(dId)) {
+                variant.removePermaMod(dId);
+                variant.addPermaMod(getId(), true);
+            } else if (variant.getPermaMods().contains(dId)) {
+                variant.removePermaMod(dId);
+                variant.addPermaMod(getId(), false);
+            } else if (variant.getNonBuiltInHullmods().contains(dId)) {
+                variant.removeMod(dId);
+                variant.addMod(getId());
+            }
+        }
     }
 
     @Override
@@ -130,11 +146,11 @@ public final class DataEnactDomain implements HullModEffect {
         if (!sanctuary.get(getId()).isApplicableToShip(ship)) {
             return false;
         }
-        Set<String> currentBlackList = getBlackList();
-        for (String hullmodId : ship.getVariant().getHullMods()) {
-            if (currentBlackList.contains(hullmodId)) {
+        for (String hullmodId : getBlackList()) {
+            if (ship.getVariant().getHullMods().contains(hullmodId)) {
                 return false;
             }
+            
         }
         return true;
     }
@@ -144,7 +160,7 @@ public final class DataEnactDomain implements HullModEffect {
         if (!sanctuary.get(getId()).isApplicableToShip(ship)) {
             return sanctuary.get(getId()).getUnapplicableReason(ship);
         }
-        Set<String> allBlackList = getBlackList();
+        List<String> allBlackList = getBlackList();
         StringBuilder sb = new StringBuilder();
         boolean isFirst = true;
         for (String hullmodId : ship.getVariant().getHullMods()) {

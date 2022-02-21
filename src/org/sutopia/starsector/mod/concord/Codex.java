@@ -1,6 +1,11 @@
 package org.sutopia.starsector.mod.concord;
 
 public class Codex {
+    // concord ids
+    //public static final String CONCORD_PHASE_SYSTEM_ID = "concord_mod_phasecloak";
+    public static final String CONCORD_PHASE_SYSTEM_GEN_PREFIX = "concord_mod_";
+    public static final String CONCORD_CAPTAIN_HULLMOD_ID = "concord_captain";
+    
     // concord implement *double* check
     // if someone manage to somehow F this up it must be intentional
     public static final String ID_PREFIX_CONCORD_DOPPELGANGER = "concord_";
@@ -36,6 +41,7 @@ public class Codex {
     public static final String TOPIC_ROTATE = "forced_rotation";
     // do not back off
     public static final String TOPIC_AI = "ai_flag";
+    
     
     // legacy implementations
     public static final String VANILLA_EXCLUSIVE_PREFIX = "vEx_";
