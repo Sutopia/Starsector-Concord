@@ -173,7 +173,7 @@ public final class ConcordAssembly extends BaseModPlugin {
         }
         
         // override cloak script
-        final ShipSystemSpecAPI concordPhase = Global.getSettings().getShipSystemSpec("concord_mod_phasecloak");
+        /*final ShipSystemSpecAPI concordPhase = Global.getSettings().getShipSystemSpec("concord_mod_phasecloak");
         ShipSystemSpecAPI vanillaPhase = Global.getSettings().getShipSystemSpec("phasecloak");
         HashSet<String> phaseSystems = new HashSet<>();
         for (ShipSystemSpecAPI spec : Global.getSettings().getAllShipSystemSpecs()) {
@@ -213,12 +213,12 @@ public final class ConcordAssembly extends BaseModPlugin {
             if (phaseSystems.contains(spec.getShipDefenseId())) {
                 spec.setShipDefenseId(Codex.CONCORD_PHASE_SYSTEM_GEN_PREFIX + spec.getShipDefenseId());
             }
-        }
+        }*/
         
         // Shell for S-Mod display correction
         Global.setSettings(new ConcordSettings(Global.getSettings()));
         DataEnactDomain.resetCache();
-        // throw new RuntimeException(ConcordCaptain.specs.size() + "");
+        //throw new RuntimeException(ConcordCaptain.specs);
     }
     
     @Override
@@ -234,15 +234,6 @@ public final class ConcordAssembly extends BaseModPlugin {
             }
         }
         
-        FactionAPI player = Global.getSector().getPlayerFaction();
-        for (HullModSpecAPI spec : ConcordCaptain.specs) {
-            String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
-            if (player.knowsHullMod(spec.getId()) 
-                    && !player.knowsHullMod(doppelganger)) {
-                player.addKnownHullMod(doppelganger);
-            }
-        }
-        
         // register tracked hullmods
         for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
             if (spec.getEffect() instanceof TrackedHullmodEffect) {
@@ -250,6 +241,44 @@ public final class ConcordAssembly extends BaseModPlugin {
             }
         }
         
+        mirrorSync();
+        
         //Global.getSector().addTransientScript(new ConcordCommander());
+    }
+    
+    @Override
+    public void afterGameSave() {
+        mirrorSync();
+    }
+    @Override
+    public void beforeGameSave() {
+        FactionAPI player = Global.getSector().getPlayerFaction();
+        for (HullModSpecAPI spec : ConcordCaptain.specs) {
+            if (player.knowsHullMod(spec.getId())) {
+                spec.setHidden(false);
+            }
+        }
+    }
+    
+    private static void mirrorSync() {
+        FactionAPI player = Global.getSector().getPlayerFaction();
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
+            if (Global.getSettings().getHullModSpec(doppelganger) == null) {
+                return;
+            }
+            if (player.knowsHullMod(spec.getId()) 
+                    && !player.knowsHullMod(doppelganger)) {
+                player.addKnownHullMod(doppelganger);
+            }
+        }
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            if (spec.getEffect() instanceof DataEnactDomain) {
+                if (player.knowsHullMod(Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId())
+                        && !player.knowsHullMod(spec.getId())) {
+                    player.addKnownHullMod(spec.getId());
+                }
+            }
+        }
     }
 }
