@@ -265,7 +265,7 @@ public final class ConcordAssembly extends BaseModPlugin {
         for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
             String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
             if (Global.getSettings().getHullModSpec(doppelganger) == null) {
-                return;
+                continue;
             }
             if (player.knowsHullMod(spec.getId()) 
                     && !player.knowsHullMod(doppelganger)) {
