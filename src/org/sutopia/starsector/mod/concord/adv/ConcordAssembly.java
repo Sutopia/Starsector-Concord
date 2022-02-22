@@ -262,16 +262,7 @@ public final class ConcordAssembly extends BaseModPlugin {
     
     private static void mirrorSync() {
         FactionAPI player = Global.getSector().getPlayerFaction();
-        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
-            String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
-            if (Global.getSettings().getHullModSpec(doppelganger) == null) {
-                continue;
-            }
-            if (player.knowsHullMod(spec.getId()) 
-                    && !player.knowsHullMod(doppelganger)) {
-                player.addKnownHullMod(doppelganger);
-            }
-        }
+        
         for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
             if (spec.getEffect() instanceof DataEnactDomain) {
                 if (player.knowsHullMod(Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId())
@@ -279,6 +270,20 @@ public final class ConcordAssembly extends BaseModPlugin {
                     player.addKnownHullMod(spec.getId());
                 }
             }
+        }
+        
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
+            HullModSpecAPI doppelSpec = Global.getSettings().getHullModSpec(doppelganger);
+            if (doppelSpec == null) {
+                continue;
+            }
+            if (player.knowsHullMod(spec.getId()) 
+                    && !player.knowsHullMod(doppelganger)) {
+                player.addKnownHullMod(doppelganger);
+            }
+            spec.setHidden(false);
+            doppelSpec.setHidden(true);
         }
     }
 }

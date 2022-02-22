@@ -6,6 +6,8 @@ import java.util.HashSet;
 import org.sutopia.starsector.mod.concord.dynamic.MutableHullModSpec;
 import org.sutopia.starsector.mod.concord.dynamic.MutableSettingsAPI;
 
+import sun.reflect.Reflection;
+
 import com.fs.starfarer.api.SettingsAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
 
@@ -25,7 +27,7 @@ public class ConcordSettings extends MutableSettingsAPI {
         if (!needMock.contains(modId)) {
             return real;
         }
-        if (real.isHidden() || real.isAlwaysUnlocked()) {
+        if (real.isHidden()) {
             StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
             for (StackTraceElement trace : stackTraceElements) {
                 String callerMethod = trace.getMethodName();
@@ -34,11 +36,6 @@ public class ConcordSettings extends MutableSettingsAPI {
                         return cachedMock.get(real.getId());
                     }
                     HullModSpecAPI mock = new MutableHullModSpec(real) {
-                        @Override
-                        public boolean isHiddenEverywhere() {
-                            return false;
-                        }
-
                         @Override
                         public boolean isHidden() {
                             return false;
