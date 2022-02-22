@@ -1,0 +1,6 @@
+{
+	"su_Concord":{
+                incompatible_description: "The following hullmods are incompatible with this hullmod:\n",
+                incompatible_reason: "This hullmod currently has no effect due to incompatible hull modifications.\n\n%s is incompatible with:\n%s",
+	}
+}
