@@ -82,6 +82,10 @@ public final class ConcordAssembly extends BaseModPlugin {
                 original.addTag(Codex.TAG_CONCORD_CUSTODY);
                 if (original.isHidden()) {
                     original.addTag(Codex.TAG_CONCORD_HIDDEN);
+                } else {
+                    ConcordCaptain.doppelgangers.add(spec);
+                    ConcordCaptain.specs.add(Global.getSettings().getHullModSpec(spec.getId()));
+                    ConcordSettings.needMock.add(spec.getId());
                 }
             }
         }
@@ -162,18 +166,14 @@ public final class ConcordAssembly extends BaseModPlugin {
                 
                 if (!((DataEnactDomain) spec.getEffect()).getBlackList().isEmpty()) {
                     if (!Global.getSettings().getHullModSpec(spec.getId()).isHidden()) {
-                        ConcordSettings.needMock.add(spec.getId());
                         
-                        ConcordCaptain.doppelgangers.add(spec);
-                        
-                        ConcordCaptain.specs.add(Global.getSettings().getHullModSpec(spec.getId()));
                     }
                 }
             }
         }
         
         // override cloak script
-        /*final ShipSystemSpecAPI concordPhase = Global.getSettings().getShipSystemSpec("concord_mod_phasecloak");
+        final ShipSystemSpecAPI concordPhase = Global.getSettings().getShipSystemSpec("concord_mod_phasecloak");
         ShipSystemSpecAPI vanillaPhase = Global.getSettings().getShipSystemSpec("phasecloak");
         HashSet<String> phaseSystems = new HashSet<>();
         for (ShipSystemSpecAPI spec : Global.getSettings().getAllShipSystemSpecs()) {
@@ -213,7 +213,7 @@ public final class ConcordAssembly extends BaseModPlugin {
             if (phaseSystems.contains(spec.getShipDefenseId())) {
                 spec.setShipDefenseId(Codex.CONCORD_PHASE_SYSTEM_GEN_PREFIX + spec.getShipDefenseId());
             }
-        }*/
+        }
         
         // Shell for S-Mod display correction
         Global.setSettings(new ConcordSettings(Global.getSettings()));
@@ -264,15 +264,6 @@ public final class ConcordAssembly extends BaseModPlugin {
         FactionAPI player = Global.getSector().getPlayerFaction();
         
         for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
-            if (spec.getEffect() instanceof DataEnactDomain) {
-                if (player.knowsHullMod(Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId())
-                        && !player.knowsHullMod(spec.getId())) {
-                    player.addKnownHullMod(spec.getId());
-                }
-            }
-        }
-        
-        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
             String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
             HullModSpecAPI doppelSpec = Global.getSettings().getHullModSpec(doppelganger);
             if (doppelSpec == null) {
@@ -282,8 +273,14 @@ public final class ConcordAssembly extends BaseModPlugin {
                     && !player.knowsHullMod(doppelganger)) {
                 player.addKnownHullMod(doppelganger);
             }
-            spec.setHidden(false);
-            doppelSpec.setHidden(true);
+            if (player.knowsHullMod(doppelganger)
+                    && !player.knowsHullMod(spec.getId())) {
+                player.addKnownHullMod(spec.getId());
+            }
+            if (ConcordCaptain.specs.contains(spec)) {
+                spec.setHidden(false);
+                doppelSpec.setHidden(true);
+            }
         }
     }
 }
