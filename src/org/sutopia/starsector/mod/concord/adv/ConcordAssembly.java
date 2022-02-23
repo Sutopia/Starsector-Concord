@@ -13,6 +13,7 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
+import com.fs.starfarer.api.combat.ShipHullSpecAPI.ShipTypeHints;
 import com.fs.starfarer.api.combat.ShipSystemSpecAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
@@ -207,11 +208,15 @@ public final class ConcordAssembly extends BaseModPlugin {
         }
         
         for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
+            boolean wasPhase = spec.isPhase();
             if (phaseSystems.contains(spec.getShipSystemId())) {
                 spec.setShipSystemId(Codex.CONCORD_PHASE_SYSTEM_GEN_PREFIX + spec.getShipSystemId());
             }
             if (phaseSystems.contains(spec.getShipDefenseId())) {
                 spec.setShipDefenseId(Codex.CONCORD_PHASE_SYSTEM_GEN_PREFIX + spec.getShipDefenseId());
+            }
+            if (wasPhase && !spec.isPhase()) {
+                spec.getHints().add(ShipTypeHints.PHASE);
             }
         }
         

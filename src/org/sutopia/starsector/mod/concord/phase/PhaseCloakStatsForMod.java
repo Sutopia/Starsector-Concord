@@ -9,8 +9,7 @@ import com.fs.starfarer.api.impl.campaign.ids.Stats;
 import com.fs.starfarer.api.impl.combat.PhaseCloakStats;
 
 public class PhaseCloakStatsForMod extends PhaseCloakStats {
-    //public static final String PTSD_HULLMOD_ID = "su_phase_ptsd";
-    // public static final float MANEUVERABILITY_BONUS = 50f;
+    
     public static final float PTSD_NO_PENALTY_FLUX_LEVEL = .25f;
 
     public static float getMaxTimeMult(MutableShipStatsAPI stats) {

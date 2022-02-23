@@ -77,10 +77,10 @@ public final class Incompatible extends BaseHullMod {
         if (originalMod != null) {
             newMod.setDisplayName("(Incompatible) " + originalMod.getDisplayName());
             newMod.setSpriteName(originalMod.getSpriteName());
-            newMod.setFrigateCost(Math.max(newMod.getFrigateCost(), originalMod.getFrigateCost()));
-            newMod.setDestroyerCost(Math.max(newMod.getDestroyerCost(), originalMod.getDestroyerCost()));
-            newMod.setCruiserCost(Math.max(newMod.getCruiserCost(), originalMod.getCruiserCost()));
-            newMod.setCapitalCost(Math.max(newMod.getCapitalCost(), originalMod.getCapitalCost()));
+            newMod.setFrigateCost(originalMod.getFrigateCost());
+            newMod.setDestroyerCost(originalMod.getDestroyerCost());
+            newMod.setCruiserCost(originalMod.getCruiserCost());
+            newMod.setCapitalCost(originalMod.getCapitalCost());
             newMod.setDescriptionFormat(Global.getSettings().getString(Codex.CONCORD_STRING_CAT, "incompatible_reason"));
         }
     }

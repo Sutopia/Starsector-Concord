@@ -12,7 +12,9 @@ import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.HullModEffect;
+import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
+import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
 
 public class ConcordCaptain extends BaseHullMod {
@@ -22,6 +24,11 @@ public class ConcordCaptain extends BaseHullMod {
     public static final HashMap<String, HullModEffect> trackedHullmods = new HashMap<>();
 
     private static final HashMap<String, HashSet<String>> installMemory = new HashMap<>();
+    
+    @Override
+    public void applyEffectsBeforeShipCreation(HullSize hullSize, MutableShipStatsAPI stats, String id) {
+        
+    }
     
     @SuppressWarnings("deprecation")
     @Override
@@ -74,7 +81,7 @@ public class ConcordCaptain extends BaseHullMod {
         if (player == null) {
             return;
         }
-        
+        ConcordSettings.resetSkip();
         for (HullModSpecAPI spec: specs) {
             String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
             if (player.knowsHullMod(spec.getId()) 
@@ -88,16 +95,4 @@ public class ConcordCaptain extends BaseHullMod {
             doppelganger.setHidden(ship.getVariant().hasHullMod(doppelganger.getId()));
         }
     }
-    
-    /*@Override
-    public void applyEffectsBeforeShipCreation(HullSize hullSize,
-            MutableShipStatsAPI stats, String id) {
-        for (HullModSpecAPI spec: specs) {
-            spec.setHidden(false);
-        }
-        
-        for (HullModSpecAPI doppelganger: doppelgangers) {
-            doppelganger.setHidden(true);
-        }
-    }*/
 }
