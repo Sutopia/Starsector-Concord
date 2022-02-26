@@ -34,6 +34,10 @@ public final class DataEnactDomain implements HullModEffect {
     
     private static final HashMap<String, ArrayList<String>> cachedBlackList = new HashMap<>();
     
+    private static final String getString(String key) {
+        return Global.getSettings().getString(Codex.CONCORD_STRING_CAT, key);
+    }
+    
     private String getId() {
         return spec.getId();
     }
@@ -169,7 +173,7 @@ public final class DataEnactDomain implements HullModEffect {
                 }
             }
         }
-        return Global.getSettings().getString(Codex.CONCORD_STRING_CAT, "incompatible_description") + sb.toString();
+        return getString("incompatible_description") + sb.toString();
     }
 
     @Override
@@ -210,7 +214,7 @@ public final class DataEnactDomain implements HullModEffect {
             if (ship == null || isForModSpec) return;
             if (!com.fs.starfarer.api.impl.combat.PhaseCloakStats.FLUX_LEVEL_AFFECTS_SPEED) return;
             tooltip.addSpacer(6f);
-            tooltip.addSectionHeading("Phase Coil Stress Model", Alignment.MID, 0);
+            tooltip.addSectionHeading(getString("phase_stress_model_title"), Alignment.MID, 0);
             tooltip.addSpacer(6f);
             
             float noPenaltyLevel = PhaseCloakStatsForMod.computeEffective(ship, ConcordModStats.PHASE_STRESS_START_FLUX_LEVEL, 0f);
@@ -219,32 +223,34 @@ public final class DataEnactDomain implements HullModEffect {
             
             if (threshold <= noPenaltyLevel) {
                 if (threshold > 0f && threshold < 1f) {
-                    tooltip.addPara("No stress below %s hard flux level.", 0f, Color.ORANGE, String.format("%d%%", Math.round(threshold * 100f)));
-                    tooltip.addPara("Max stress above %s hard flux level.", 0f, Color.ORANGE, String.format("%d%%", Math.round(threshold * 100f)));
+                    tooltip.addPara(getString("phase_stress_desc_no_below"), 0f, Color.ORANGE, String.format("%d%%", Math.round(threshold * 100f)));
+                    tooltip.addPara(getString("phase_stress_desc_max_above"), 0f, Color.ORANGE, 
+                            String.format("%d%%", Math.round(penaltyMaxMult * 100f)),
+                            String.format("%d%%", Math.round(threshold * 100f)));
                 } else if (threshold <= 0f) {
-                    tooltip.addPara("Always %s stress.", 0f, Color.ORANGE, "maximum");
+                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Color.ORANGE, getString("phase_stress_desc_max"));
                 } else {
-                    tooltip.addPara("Always %s stress.", 0f, Color.ORANGE, "no");
+                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Color.ORANGE, getString("phase_stress_desc_no"));
                 }
             } else {
                 if (noPenaltyLevel >= 1f) {
-                    tooltip.addPara("Always %s stress.", 0f, Color.ORANGE, "no");
+                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Color.ORANGE, getString("phase_stress_desc_no"));
                 } else if (threshold <= 0f) {
-                    tooltip.addPara("Always %s stress.", 0f, Color.ORANGE, "maximum");
+                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Color.ORANGE, getString("phase_stress_desc_max"));
                 } else {
                     float slope = 1f / (threshold - noPenaltyLevel);
                     if (noPenaltyLevel < 0f) {
                         float stressAtZero = (-noPenaltyLevel) / slope;
-                        tooltip.addPara("Stress level starts at %s at 0 hard flux.", 0f, Color.ORANGE, String.format("%d%%", Math.round(stressAtZero * 100f)));
+                        tooltip.addPara(getString("phase_stress_desc_low_zero"), 0f, Color.ORANGE, String.format("%d%%", Math.round(stressAtZero * 100f)));
                     } else {
-                        tooltip.addPara("No stress below %s hard flux level.", 0f, Color.ORANGE, String.format("%d%%", Math.round(noPenaltyLevel * 100f)));
+                        tooltip.addPara(getString("phase_stress_desc_low_bnd"), 0f, Color.ORANGE, String.format("%d%%", Math.round(noPenaltyLevel * 100f)));
                     }
                     
                    if (threshold * penaltyMaxMult >= 1f) {
                         float stressAtMax = slope * (1f - noPenaltyLevel);
-                        tooltip.addPara("Maximum stress %s at full hard flux.", 0f, Color.ORANGE, String.format("%d%%", Math.round(stressAtMax * 100f)));
+                        tooltip.addPara(getString("phase_stress_desc_high_full"), 0f, Color.ORANGE, String.format("%d%%", Math.round(stressAtMax * 100f)));
                     } else {
-                        tooltip.addPara("Maximum stress %s at %s hard flux level.", 0f, Color.ORANGE,
+                        tooltip.addPara(getString("phase_stress_desc_high_bnd"), 0f, Color.ORANGE,
                                 String.format("%d%%", Math.round(penaltyMaxMult * 100f)),
                                 String.format("%d%%", Math.round(threshold * penaltyMaxMult * 100f)));
                     }

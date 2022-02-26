@@ -2,5 +2,33 @@
 	"su_Concord":{
                 incompatible_description: "The following hullmods are incompatible with this hullmod:\n",
                 incompatible_reason: "This hullmod currently has no effect due to incompatible hull modifications.\n\n%s is incompatible with:\n%s",
+				
+				phase_tidi_content: "time flow altered : x%.1f",
+				phase_coil_stable_title: "phase coils stable",
+				phase_coil_stable_content: "all system stable",
+				phase_coil_stressed_title:"phase coil stressed",
+				
+				phase_stress_engine_title:"phase stress engine effect",
+				phase_stress_system_title: "phase stress system effect",
+				phase_stress_flux_title: "phase stress flux effect",
+				
+				phase_stress_max_speed_desc: "top speed",
+				phase_stress_zero_flux_desc: "zero flux speed boost",
+				phase_stress_maneuverability_desc: "maneuverability",
+				phase_stress_sys_cd_desc: "system cooldown speed",
+				phase_stress_sys_range_desc: "system range",
+				phase_stress_flux_diss_desc = "flux dissipation",
+				phase_stress_upkeep_desc = "phase upkeep flux",
+				
+				phase_stress_model_title: "Phase Coil Stress Model",
+				phase_stress_desc_always: "Always %s stress.",
+				phase_stress_desc_no: "no",
+				phase_stress_desc_max: "maximum",
+				phase_stress_desc_no_below: "No stress below %s hard flux level.",
+				phase_stress_desc_max_above: "Maximum stress %s above %s hard flux level.",
+				phase_stress_desc_low_bnd: "No stress below %s hard flux level.",
+				phase_stress_desc_low_zero: "Stress level starts at %s at 0 hard flux.",
+				phase_stress_desc_high_full: "Maximum stress %s at full hard flux.",
+				phase_stress_desc_high_bnd: "Maximum stress %s at %s hard flux level.",
 	}
 }

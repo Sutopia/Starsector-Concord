@@ -1,5 +1,7 @@
 package org.sutopia.starsector.mod.concord.phase;
 
+import org.sutopia.starsector.mod.concord.Codex;
+
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.MutableStat;
@@ -20,6 +22,10 @@ public class PhaseCloakStatsForMod extends PhaseCloakStats {
     protected Object STATUSKEY09 = new Object();
     protected Object STATUSKEY10 = new Object();
     protected Object STATUSKEY11 = new Object();
+    
+    private static final String getString(String key) {
+        return Global.getSettings().getString(Codex.CONCORD_STRING_CAT, key);
+    }
     
     public static boolean showPhaseModDetails() {
         return Global.getSettings().getBoolean("concord_phase_detail");
@@ -262,7 +268,7 @@ public class PhaseCloakStatsForMod extends PhaseCloakStats {
             return;
         
         if (!playerShip.getMutableStats().getTimeMult().isUnmodified()) {
-            String msg = String.format("time flow altered : x%.1f", playerShip.getMutableStats().getTimeMult().modified);
+            String msg = String.format(getString("phase_tidi_content"), playerShip.getMutableStats().getTimeMult().modified);
             Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY2, cloak.getSpecAPI().getIconSpriteName(),
                     cloak.getDisplayName(), msg, false);
         }
@@ -271,62 +277,62 @@ public class PhaseCloakStatsForMod extends PhaseCloakStats {
             if (level > f) {
                 if (getDisruptionLevel(playerShip) <= 0f) {
                     Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY3, cloak.getSpecAPI().getIconSpriteName(),
-                            "phase coils stable", "all system stable", false);
+                            getString("phase_coil_stable_title"), getString("phase_coil_stable_content"), false);
                 } else {
                     String stressLevel = (int) Math.round((getDisruptionLevel(playerShip)) * 100f) + "%";
                     Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY3, cloak.getSpecAPI().getIconSpriteName(),
-                            "phase coil stressed", stressLevel, true);
+                            getString("phase_coil_stressed_title"), stressLevel, true);
                     
                     String modifierId = cloak.getId() + " effect_" + playerShip.getId() + "_2"; 
                     
                     if (isModified(playerShip.getMutableStats().getMaxSpeed(), modifierId)) {
                         StringBuilder sb = new StringBuilder();
-                        buildModifierString(sb, playerShip.getMutableStats().getMaxSpeed(), modifierId, "top speed");
+                        buildModifierString(sb, playerShip.getMutableStats().getMaxSpeed(), modifierId, getString("phase_stress_max_speed_desc"));
                         
                         Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY05, cloak.getSpecAPI().getIconSpriteName(),
-                                "phase stress engine effect", sb.toString(), true);
+                                getString("phase_stress_engine_title"), sb.toString(), true);
                     }
                     
                     if (isModified(playerShip.getMutableStats().getZeroFluxSpeedBoost(), modifierId)) {
                         StringBuilder sb = new StringBuilder();
-                        buildModifierString(sb, playerShip.getMutableStats().getZeroFluxSpeedBoost(), modifierId, "zero flux speed boost");
+                        buildModifierString(sb, playerShip.getMutableStats().getZeroFluxSpeedBoost(), modifierId, getString("phase_stress_zero_flux_desc"));
                         Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY06, "graphics/icons/hullsys/infernium_injector.png",
-                                "phase stress engine effect", sb.toString(), true);
+                                getString("phase_stress_engine_title"), sb.toString(), true);
                     }
                     
                     if (isModified(playerShip.getMutableStats().getAcceleration(), modifierId)) {
                         StringBuilder sb = new StringBuilder();
-                        buildModifierString(sb, playerShip.getMutableStats().getAcceleration(), modifierId, "maneuverability");
+                        buildModifierString(sb, playerShip.getMutableStats().getAcceleration(), modifierId, getString("phase_stress_maneuverability_desc"));
                         Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY07, "graphics/icons/hullsys/maneuvering_jets.png",
-                                "phase stress engine effect", sb.toString(), true);
+                                getString("phase_stress_engine_title"), sb.toString(), true);
                     }
                     
                     if (isModified(playerShip.getMutableStats().getSystemCooldownBonus(), modifierId)) {
                         StringBuilder sb = new StringBuilder();
-                        buildModifierString(sb, playerShip.getMutableStats().getSystemCooldownBonus(), modifierId, "system cooldown speed");
+                        buildModifierString(sb, playerShip.getMutableStats().getSystemCooldownBonus(), modifierId, getString("phase_stress_sys_cd_desc"));
                         Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY08, "graphics/icons/hullsys/quantum_disruptor.png",
-                                "phase stress system effect", sb.toString(), true);
+                                getString("phase_stress_system_title"), sb.toString(), true);
                     }
                     
                     if (isModified(playerShip.getMutableStats().getAcceleration(), modifierId)) {
                         StringBuilder sb = new StringBuilder();
-                        buildModifierString(sb, playerShip.getMutableStats().getSystemRangeBonus(), modifierId, "system range");
+                        buildModifierString(sb, playerShip.getMutableStats().getSystemRangeBonus(), modifierId, getString("phase_stress_sys_range_desc"));
                         Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY09, "graphics/icons/hullsys/quantum_disruptor.png",
-                                "phase stress system effect", sb.toString(), true);
+                                getString("phase_stress_system_title"), sb.toString(), true);
                     }
                     
                     if (isModified(playerShip.getMutableStats().getFluxDissipation(), modifierId)) {
                         StringBuilder sb = new StringBuilder();
-                        buildModifierString(sb, playerShip.getMutableStats().getFluxDissipation(), modifierId, "flux dissipation");
+                        buildModifierString(sb, playerShip.getMutableStats().getFluxDissipation(), modifierId, getString("phase_stress_flux_diss_desc"));
                         Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY10, "graphics/icons/tactical/venting_flux.png",
-                                "phase stress flux effect", sb.toString(), true);
+                                getString("phase_stress_flux_title"), sb.toString(), true);
                     }
                     
                     if (isModified(playerShip.getMutableStats().getPhaseCloakUpkeepCostBonus(), modifierId)) {
                         StringBuilder sb = new StringBuilder();
-                        buildModifierString(sb, playerShip.getMutableStats().getPhaseCloakUpkeepCostBonus(), modifierId, "phase upkeep flux");
+                        buildModifierString(sb, playerShip.getMutableStats().getPhaseCloakUpkeepCostBonus(), modifierId, getString("phase_stress_upkeep_desc"));
                         Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY11, cloak.getSpecAPI().getIconSpriteName(),
-                                "phase stress flux effect", sb.toString(), true);
+                                getString("phase_stress_flux_title"), sb.toString(), true);
                     }
                 }
             }
