@@ -214,6 +214,8 @@ public final class ConcordAssembly extends BaseModPlugin {
                 });
             }
         }
+        
+        Global.getSector().addTransientListener(new ConcordCommander());
 
         // this is too late in execution to clean up
         /*FactionAPI player = Global.getSector().getPlayerFaction();

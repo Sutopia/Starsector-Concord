@@ -25,7 +25,11 @@ public class ConcordCaptain extends BaseHullMod implements GlobalTransientHullmo
     public static final HashMap<String, TrackedHullmodEffect> trackedHullmods = new HashMap<>();
 
     private static final HashMap<String, HashSet<String>> installMemory = new HashMap<>();
-
+    
+    public static void clearMemCache() {
+        installMemory.clear();
+    }
+    
     @Override
     public void applyEffectsBeforeShipCreation(HullSize hullSize, MutableShipStatsAPI stats, String id) {
         if (stats == null) {
