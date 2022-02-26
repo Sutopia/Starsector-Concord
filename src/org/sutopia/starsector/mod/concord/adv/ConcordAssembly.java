@@ -7,6 +7,7 @@ import java.util.HashSet;
 import org.sutopia.starsector.mod.concord.Codex;
 import org.sutopia.starsector.mod.concord.api.OnInstallHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.OnRemoveHullmodEffect;
+import org.sutopia.starsector.mod.concord.api.SelectiveTransientHullmod;
 import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.GlobalTransientHullmod;
 import org.sutopia.starsector.mod.concord.dynamic.MutableShipSystemSpecAPI;
@@ -15,7 +16,6 @@ import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.CargoAPI;
-import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.FleetDataAPI;
 import com.fs.starfarer.api.campaign.LocationAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
@@ -215,7 +215,8 @@ public final class ConcordAssembly extends BaseModPlugin {
             }
         }
 
-        FactionAPI player = Global.getSector().getPlayerFaction();
+        // this is too late in execution to clean up
+        /*FactionAPI player = Global.getSector().getPlayerFaction();
         for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
             String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
             if (player.knowsHullMod(doppelganger)) {
@@ -224,7 +225,7 @@ public final class ConcordAssembly extends BaseModPlugin {
                     player.addKnownHullMod(spec.getId());
                 }
             }
-        }
+        }*/
     }
     
     @Override
@@ -246,8 +247,14 @@ public final class ConcordAssembly extends BaseModPlugin {
     }
     
     public void addHullmodEverywhere(String hullmodId) {
-        if (Global.getSettings().getHullModSpec(hullmodId) == null) return;
+        HullModSpecAPI hullmod = Global.getSettings().getHullModSpec(hullmodId);
+        if (hullmod == null) return;
         for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
+            if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
+                if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToSpec(spec)) {
+                    continue;
+                }
+            }
             if (!spec.isBuiltInMod(hullmodId)) {
                 spec.addBuiltInMod(hullmodId);
             }
@@ -255,6 +262,11 @@ public final class ConcordAssembly extends BaseModPlugin {
 
         for (String id : Global.getSettings().getAllVariantIds()) {
             ShipVariantAPI variant = Global.getSettings().getVariant(id);
+            if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
+                if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToVariant(variant)) {
+                    continue;
+                }
+            }
             if (!variant.hasHullMod(hullmodId)) {
                 variant.addPermaMod(hullmodId, false);
             }
@@ -264,6 +276,11 @@ public final class ConcordAssembly extends BaseModPlugin {
             for (CampaignFleetAPI fleet : loc.getFleets()) {
                 for (FleetMemberAPI member : fleet.getFleetData().getMembersListCopy()) {
                     ShipVariantAPI variant = member.getVariant();
+                    if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
+                        if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToVariant(variant)) {
+                            continue;
+                        }
+                    }
                     if (!variant.hasHullMod(hullmodId)) {
                         variant.addPermaMod(hullmodId, false);
                     }
@@ -277,6 +294,11 @@ public final class ConcordAssembly extends BaseModPlugin {
                     if (fleetData == null) continue;
                     for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
                         ShipVariantAPI variant = member.getVariant();
+                        if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
+                            if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToVariant(variant)) {
+                                continue;
+                            }
+                        }
                         if (!variant.hasHullMod(hullmodId)) {
                             variant.addPermaMod(hullmodId, false);
                         }
@@ -287,7 +309,8 @@ public final class ConcordAssembly extends BaseModPlugin {
     }
     
     public void removeHullmodEverywhere(String hullmodId) {
-        if (Global.getSettings().getHullModSpec(hullmodId) == null) return;
+        HullModSpecAPI hullmod = Global.getSettings().getHullModSpec(hullmodId);
+        if (hullmod == null) return;
         for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
             if (spec.isBuiltInMod(hullmodId)) {
                 spec.getBuiltInMods().remove(hullmodId);
