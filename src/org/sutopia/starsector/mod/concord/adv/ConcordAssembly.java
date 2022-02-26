@@ -8,12 +8,18 @@ import org.sutopia.starsector.mod.concord.Codex;
 import org.sutopia.starsector.mod.concord.api.OnInstallHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.OnRemoveHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
+import org.sutopia.starsector.mod.concord.api.GlobalTransientHullmod;
 import org.sutopia.starsector.mod.concord.dynamic.MutableShipSystemSpecAPI;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
+import com.fs.starfarer.api.campaign.CargoAPI;
 import com.fs.starfarer.api.campaign.FactionAPI;
+import com.fs.starfarer.api.campaign.FleetDataAPI;
+import com.fs.starfarer.api.campaign.LocationAPI;
+import com.fs.starfarer.api.campaign.econ.MarketAPI;
+import com.fs.starfarer.api.campaign.econ.SubmarketAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.combat.ShipSystemSpecAPI;
@@ -176,14 +182,9 @@ public final class ConcordAssembly extends BaseModPlugin {
 
     @Override
     public void onGameLoad(boolean newGame) {
-        // TODO: make apply global hullmod interface
-        CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
-        if (fleet != null) {
-            for (FleetMemberAPI member : fleet.getFleetData().getMembersListCopy()) {
-                ShipVariantAPI variant = member.getVariant();
-                if (!variant.hasHullMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID)) {
-                    variant.addPermaMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID, false);
-                }
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            if (spec.getEffect() instanceof GlobalTransientHullmod) {
+                addHullmodEverywhere(spec.getId());
             }
         }
 
@@ -221,6 +222,109 @@ public final class ConcordAssembly extends BaseModPlugin {
                 player.removeKnownHullMod(doppelganger);
                 if (!player.knowsHullMod(spec.getId())) {
                     player.addKnownHullMod(spec.getId());
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void afterGameSave() {
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            if (spec.getEffect() instanceof GlobalTransientHullmod) {
+                addHullmodEverywhere(spec.getId());
+            }
+        }
+    }
+    
+    @Override
+    public void beforeGameSave() {
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            if (spec.getEffect() instanceof GlobalTransientHullmod) {
+                removeHullmodEverywhere(spec.getId());
+            }
+        }
+    }
+    
+    public void addHullmodEverywhere(String hullmodId) {
+        if (Global.getSettings().getHullModSpec(hullmodId) == null) return;
+        for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
+            if (!spec.isBuiltInMod(hullmodId)) {
+                spec.addBuiltInMod(hullmodId);
+            }
+        }
+
+        for (String id : Global.getSettings().getAllVariantIds()) {
+            ShipVariantAPI variant = Global.getSettings().getVariant(id);
+            if (!variant.hasHullMod(hullmodId)) {
+                variant.addPermaMod(hullmodId, false);
+            }
+        }
+        
+        for (LocationAPI loc : Global.getSector().getAllLocations()) {
+            for (CampaignFleetAPI fleet : loc.getFleets()) {
+                for (FleetMemberAPI member : fleet.getFleetData().getMembersListCopy()) {
+                    ShipVariantAPI variant = member.getVariant();
+                    if (!variant.hasHullMod(hullmodId)) {
+                        variant.addPermaMod(hullmodId, false);
+                    }
+                }
+            }
+            for (MarketAPI market : Global.getSector().getEconomy().getMarkets(loc)) {
+                for (SubmarketAPI sub : market.getSubmarketsCopy()) {
+                    CargoAPI cargo = sub.getCargo();
+                    if (cargo == null) continue;
+                    FleetDataAPI fleetData = cargo.getFleetData();
+                    if (fleetData == null) continue;
+                    for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
+                        ShipVariantAPI variant = member.getVariant();
+                        if (!variant.hasHullMod(hullmodId)) {
+                            variant.addPermaMod(hullmodId, false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public void removeHullmodEverywhere(String hullmodId) {
+        if (Global.getSettings().getHullModSpec(hullmodId) == null) return;
+        for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
+            if (spec.isBuiltInMod(hullmodId)) {
+                spec.getBuiltInMods().remove(hullmodId);
+            }
+        }
+
+        for (String id : Global.getSettings().getAllVariantIds()) {
+            ShipVariantAPI variant = Global.getSettings().getVariant(id);
+            if (variant.hasHullMod(hullmodId)) {
+                variant.removeMod(hullmodId);
+                variant.removePermaMod(hullmodId);
+            }
+        }
+        
+        for (LocationAPI loc : Global.getSector().getAllLocations()) {
+            for (CampaignFleetAPI fleet : loc.getFleets()) {
+                for (FleetMemberAPI member : fleet.getFleetData().getMembersListCopy()) {
+                    ShipVariantAPI variant = member.getVariant();
+                    if (variant.hasHullMod(hullmodId)) {
+                        variant.removeMod(hullmodId);
+                        variant.removePermaMod(hullmodId);
+                    }
+                }
+            }
+            for (MarketAPI market : Global.getSector().getEconomy().getMarkets(loc)) {
+                for (SubmarketAPI sub : market.getSubmarketsCopy()) {
+                    CargoAPI cargo = sub.getCargo();
+                    if (cargo == null) continue;
+                    FleetDataAPI fleetData = cargo.getFleetData();
+                    if (fleetData == null) continue;
+                    for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
+                        ShipVariantAPI variant = member.getVariant();
+                        if (variant.hasHullMod(hullmodId)) {
+                            variant.removeMod(hullmodId);
+                            variant.removePermaMod(hullmodId);
+                        }
+                    }
                 }
             }
         }

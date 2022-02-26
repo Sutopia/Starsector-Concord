@@ -6,13 +6,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
+import org.sutopia.starsector.mod.concord.api.GlobalTransientHullmod;
 
 import com.fs.starfarer.api.combat.BaseHullMod;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 
-public class ConcordCaptain extends BaseHullMod {
+public class ConcordCaptain extends BaseHullMod implements GlobalTransientHullmod {
     
     public static final HashMap<String, TrackedHullmodEffect> trackedHullmods = new HashMap<>();
 

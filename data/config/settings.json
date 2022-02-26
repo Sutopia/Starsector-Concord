@@ -4,6 +4,6 @@
     #true: check if other mods implemented vanila exclusiveness and comply
     #false: skip the cross-mod check but still enforce the basic incompatibility mod author is implementing
     "concord_phase_detail" : true,
-	#setting to show all phase stress induced effects
-	#default is true, set to false if it's spamming your screen
+    #setting to show all phase stress induced effects
+    #default is true, set to false if it's spamming your screen
 }
