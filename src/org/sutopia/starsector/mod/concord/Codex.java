@@ -13,8 +13,8 @@ public class Codex {
     
     public static final String TAG_OWN_TOPIC = "vanilla_auto_concord";
     
-    public static final String TAG_CONCORD_CUSTODY = "custody_by_concord";
-    public static final String TAG_CONCORD_HIDDEN = "concord_immutable";
+    //public static final String TAG_CONCORD_CUSTODY = "custody_by_concord";
+    //public static final String TAG_CONCORD_HIDDEN = "concord_immutable";
     
     public static final String CONCORD_STRING_CAT = "su_Concord";
     
