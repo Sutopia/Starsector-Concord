@@ -86,5 +86,3 @@ Concord Captain,concord_captain,,,,,,0,,TRUE,TRUE,0,0,0,0,org.sutopia.starsector
 ,concord_never_detaches,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,concord_no_weapon_flux,0,,,"auto_concord, vanilla_auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
 ,,,,,,,,,,,,,,,,,,
-,concord_prv_flickercore,0,,,"auto_concord",,0,,TRUE,,0,0,0,0,org.sutopia.starsector.mod.concord.adv.DataEnactDomain,,,
-,,,,,,,,,,,,,,,,,,
