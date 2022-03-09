@@ -1,11 +1,13 @@
 package org.sutopia.starsector.mod.concord.adv;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.sutopia.starsector.mod.concord.Codex;
 import org.sutopia.starsector.mod.concord.api.ExternalEffect;
 import org.sutopia.starsector.mod.concord.api.FighterInducedEffect;
 import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
@@ -19,17 +21,19 @@ import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
+import com.fs.starfarer.api.ui.Alignment;
+import com.fs.starfarer.api.ui.TooltipMakerAPI;
 
 public class ConcordCaptain extends BaseHullMod implements GlobalTransientHullmod {
 
     public static final HashMap<String, TrackedHullmodEffect> trackedHullmods = new HashMap<>();
 
     private static final HashMap<String, HashSet<String>> installMemory = new HashMap<>();
-    
+
     public static void clearMemCache() {
         installMemory.clear();
     }
-    
+
     @Override
     public void applyEffectsBeforeShipCreation(HullSize hullSize, MutableShipStatsAPI stats, String id) {
         if (stats == null) {
@@ -128,6 +132,43 @@ public class ConcordCaptain extends BaseHullMod implements GlobalTransientHullmo
         }
         for (TrackedHullmodEffect effect : installEffects) {
             effect.onInstall(ship);
+        }
+        
+        for (String hullmod : ship.getVariant().getHullMods()) {
+            HullModSpecAPI modSpec = Global.getSettings().getHullModSpec(hullmod);
+            if (modSpec.hasTag(Codex.VOLATILE_EXCLUSIVE_PREFIX + Codex.TOPIC_FIGHTER_SPEC_CHANGE)) {
+                return;
+            }
+        }
+        for (int i = 0; i < ship.getVariant().getWings().size(); i++) {
+            String wingSpec = ship.getVariant().getWingId(i);
+            if (wingSpec != null && ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.containsKey(wingSpec)) {
+                ship.getVariant().setWingId(i, ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.get(wingSpec));
+            }
+        }
+    }
+
+    @Override
+    public void addPostDescriptionSection(TooltipMakerAPI tooltip, HullSize hullSize, ShipAPI ship, float width,
+            boolean isForModSpec) {
+        if (ship == null || isForModSpec) return;
+        
+        tooltip.addPara(ship.getFleetMemberId(), 2f);
+        
+        tooltip.addSpacer(6f);
+        tooltip.addSectionHeading("Installed Hullmods", Alignment.MID, 0);
+        tooltip.addSpacer(6f);
+        
+        for (String hullmod : ship.getVariant().getHullMods()) {
+            Color c = Color.WHITE;
+            HullModSpecAPI spec = Global.getSettings().getHullModSpec(hullmod);
+            if (spec.isHiddenEverywhere()) {
+                c = Color.GRAY;
+            }
+            if (trackedHullmods.containsKey(hullmod)) {
+                c = Color.BLUE;
+            }
+            tooltip.addPara(spec.getDisplayName(), c, 2f);
         }
     }
 }

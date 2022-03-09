@@ -283,7 +283,7 @@ public class PhaseCloakStatsForMod extends PhaseCloakStats {
                     Global.getCombatEngine().maintainStatusForPlayerShip(STATUSKEY3, cloak.getSpecAPI().getIconSpriteName(),
                             getString("phase_coil_stressed_title"), stressLevel, true);
                     
-                    String modifierId = cloak.getId() + " effect_" + playerShip.getId() + "_2"; 
+                    String modifierId = cloak.getId() + getString("phase_coil_effect_suffix") + playerShip.getId() + "_2"; 
                     
                     if (isModified(playerShip.getMutableStats().getMaxSpeed(), modifierId)) {
                         StringBuilder sb = new StringBuilder();

@@ -24,6 +24,7 @@ import com.fs.starfarer.api.impl.combat.PhaseCloakStats;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
 import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
+import com.fs.starfarer.api.util.Misc;
 
 public final class DataEnactDomain implements HullModEffect {
     // <id, effect>
@@ -223,34 +224,34 @@ public final class DataEnactDomain implements HullModEffect {
             
             if (threshold <= noPenaltyLevel) {
                 if (threshold > 0f && threshold < 1f) {
-                    tooltip.addPara(getString("phase_stress_desc_no_below"), 0f, Color.ORANGE, String.format("%d%%", Math.round(threshold * 100f)));
-                    tooltip.addPara(getString("phase_stress_desc_max_above"), 0f, Color.ORANGE, 
+                    tooltip.addPara(getString("phase_stress_desc_no_below"), 0f, Misc.getHighlightColor(), String.format("%d%%", Math.round(threshold * 100f)));
+                    tooltip.addPara(getString("phase_stress_desc_max_above"), 0f, Misc.getHighlightColor(), 
                             String.format("%d%%", Math.round(penaltyMaxMult * 100f)),
                             String.format("%d%%", Math.round(threshold * 100f)));
                 } else if (threshold <= 0f) {
-                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Color.ORANGE, getString("phase_stress_desc_max"));
+                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Misc.getHighlightColor(), getString("phase_stress_desc_max"));
                 } else {
-                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Color.ORANGE, getString("phase_stress_desc_no"));
+                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Misc.getHighlightColor(), getString("phase_stress_desc_no"));
                 }
             } else {
                 if (noPenaltyLevel >= 1f) {
-                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Color.ORANGE, getString("phase_stress_desc_no"));
+                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Misc.getHighlightColor(), getString("phase_stress_desc_no"));
                 } else if (threshold <= 0f) {
-                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Color.ORANGE, getString("phase_stress_desc_max"));
+                    tooltip.addPara(getString("phase_stress_desc_always"), 0f, Misc.getHighlightColor(), getString("phase_stress_desc_max"));
                 } else {
                     float slope = 1f / (threshold - noPenaltyLevel);
                     if (noPenaltyLevel < 0f) {
                         float stressAtZero = (-noPenaltyLevel) / slope;
-                        tooltip.addPara(getString("phase_stress_desc_low_zero"), 0f, Color.ORANGE, String.format("%d%%", Math.round(stressAtZero * 100f)));
+                        tooltip.addPara(getString("phase_stress_desc_low_zero"), 0f, Misc.getHighlightColor(), String.format("%d%%", Math.round(stressAtZero * 100f)));
                     } else {
-                        tooltip.addPara(getString("phase_stress_desc_low_bnd"), 0f, Color.ORANGE, String.format("%d%%", Math.round(noPenaltyLevel * 100f)));
+                        tooltip.addPara(getString("phase_stress_desc_low_bnd"), 0f, Misc.getHighlightColor(), String.format("%d%%", Math.round(noPenaltyLevel * 100f)));
                     }
                     
                    if (threshold * penaltyMaxMult >= 1f) {
                         float stressAtMax = slope * (1f - noPenaltyLevel);
-                        tooltip.addPara(getString("phase_stress_desc_high_full"), 0f, Color.ORANGE, String.format("%d%%", Math.round(stressAtMax * 100f)));
+                        tooltip.addPara(getString("phase_stress_desc_high_full"), 0f, Misc.getHighlightColor(), String.format("%d%%", Math.round(stressAtMax * 100f)));
                     } else {
-                        tooltip.addPara(getString("phase_stress_desc_high_bnd"), 0f, Color.ORANGE,
+                        tooltip.addPara(getString("phase_stress_desc_high_bnd"), 0f, Misc.getHighlightColor(),
                                 String.format("%d%%", Math.round(penaltyMaxMult * 100f)),
                                 String.format("%d%%", Math.round(threshold * penaltyMaxMult * 100f)));
                     }

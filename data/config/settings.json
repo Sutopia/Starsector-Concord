@@ -1,4 +1,5 @@
 {
+    "concord_debug" : false,
     "concord_check_mod" : true,
     #this is a setting for enable/disabling cross-mod checking of hullmods
     #true: check if other mods implemented vanila exclusiveness and comply

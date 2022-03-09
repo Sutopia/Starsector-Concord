@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.json.JSONObject;
 import org.sutopia.starsector.mod.concord.Codex;
 import org.sutopia.starsector.mod.concord.api.OnInstallHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.OnRemoveHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.SelectiveTransientHullmod;
 import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.GlobalTransientHullmod;
-import org.sutopia.starsector.mod.concord.dynamic.MutableShipSystemSpecAPI;
+import org.sutopia.starsector.mod.concord.blackops.Monitor;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
@@ -26,12 +27,15 @@ import com.fs.starfarer.api.combat.ShipSystemSpecAPI;
 import com.fs.starfarer.api.combat.ShipVariantAPI;
 import com.fs.starfarer.api.fleet.FleetMemberAPI;
 import com.fs.starfarer.api.loading.HullModSpecAPI;
-import com.fs.starfarer.api.plugins.ShipSystemStatsScript;
 
 public final class ConcordAssembly extends BaseModPlugin {
 
     @Override
     public void onApplicationLoad() throws Exception {
+        
+        if (Global.getSettings().getBoolean("concord_debug")) {
+            Global.getSettings().getHullModSpec("concord_captain").setHiddenEverywhere(false);
+        }
 
         for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
             if (!spec.isBuiltInMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID)) {
@@ -163,13 +167,45 @@ public final class ConcordAssembly extends BaseModPlugin {
         ShipSystemSpecAPI vanillaPhase = Global.getSettings().getShipSystemSpec("phasecloak");
         for (ShipSystemSpecAPI spec : Global.getSettings().getAllShipSystemSpecs()) {
             if (vanillaPhase.getStatsScriptClassName().equals(spec.getStatsScriptClassName())) {
-                MutableShipSystemSpecAPI concordSpec = new MutableShipSystemSpecAPI(spec) {
-                    @Override
-                    public ShipSystemStatsScript getStatsScript() {
-                        return concordPhase.getStatsScript();
-                    }
-                };
+                JSONObject specJson = spec.getSpecJson();
+                specJson.remove("statsScript");
+                specJson.put("statsScript", concordPhase.getStatsScriptClassName());
+                ShipSystemSpecAPI concordSpec = Monitor.CreateSysSpec(specJson);
+                concordSpec.setName(spec.getName());
                 concordSpec.setId(spec.getId());
+                concordSpec.setActive(spec.getActive());
+                concordSpec.setCanNotCauseOverload(spec.isCanNotCauseOverload());
+                concordSpec.setCanUseWhileRightClickSystemOn(spec.isCanUseWhileRightClickSystemOn());
+                concordSpec.setCooldown(spec.getCooldown(null));
+                concordSpec.setCrPerUse(spec.getCrPerUse());
+                concordSpec.setDissipationAllowed(spec.isDissipationAllowed());
+                concordSpec.setFiringAllowed(spec.isFiringAllowed());
+                concordSpec.setFluxPerSecond(spec.getFluxPerSecond());
+                concordSpec.setFluxPerSecondBaseCap(spec.getFluxPerSecondBaseCap());
+                concordSpec.setFluxPerSecondBaseRate(spec.getFluxPerSecondBaseRate());
+                concordSpec.setFluxPerUse(spec.getFluxPerUse());
+                concordSpec.setFluxPerUseBaseCap(spec.getFluxPerUseBaseCap());
+                concordSpec.setFluxPerUseBaseRate(spec.getFluxPerUseBaseRate());
+                concordSpec.setGeneratesHardFlux(spec.generatesHardFlux());
+                concordSpec.setHardDissipationAllowed(spec.isHardDissipationAllowed());
+                concordSpec.setIconSpriteName(spec.getIconSpriteName());
+                concordSpec.setIn(spec.getIn());
+                concordSpec.setMaxUses(spec.getMaxUses(null));
+                concordSpec.setOut(spec.getOut());
+                concordSpec.setOutOfUsesSound(spec.getOutOfUsesSound());
+                concordSpec.setPhaseChargedownVulnerabilityFraction(spec.getPhaseChargedownVulnerabilityFraction());
+                concordSpec.setPhaseCloak(spec.isPhaseCloak());
+                concordSpec.setRegen(spec.getRegen(null));
+                concordSpec.setRequiresZeroFluxBoost(spec.isRequiresZeroFluxBoost());
+                concordSpec.setShieldAllowed(spec.isShieldAllowed());
+                concordSpec.setStrafeAllowed(spec.isStrafeAllowed());
+                concordSpec.setToggle(spec.isToggle());
+                concordSpec.setTriggersExtraEngines(spec.isTriggersExtraEngines());
+                concordSpec.setTurningAllowed(spec.isTurningAllowed());
+                concordSpec.setUseSound(spec.getUseSound());
+                concordSpec.setVentingAllowed(spec.isVentingAllowed());
+                concordSpec.setWeaponId(spec.getWeaponId());
+                //concordSpec.setId(spec.getId());
                 Global.getSettings().getAllSpecs(spec.getClass()).remove(spec);
                 Global.getSettings().putSpec(spec.getClass(), spec.getId(), concordSpec);
             }
@@ -216,18 +252,6 @@ public final class ConcordAssembly extends BaseModPlugin {
         }
         
         Global.getSector().addTransientListener(new ConcordCommander());
-
-        // this is too late in execution to clean up
-        /*FactionAPI player = Global.getSector().getPlayerFaction();
-        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
-            String doppelganger = Codex.ID_PREFIX_CONCORD_DOPPELGANGER + spec.getId();
-            if (player.knowsHullMod(doppelganger)) {
-                player.removeKnownHullMod(doppelganger);
-                if (!player.knowsHullMod(spec.getId())) {
-                    player.addKnownHullMod(spec.getId());
-                }
-            }
-        }*/
     }
     
     @Override
@@ -248,7 +272,7 @@ public final class ConcordAssembly extends BaseModPlugin {
         }
     }
     
-    public void addHullmodEverywhere(String hullmodId) {
+    public static void addHullmodEverywhere(String hullmodId) {
         HullModSpecAPI hullmod = Global.getSettings().getHullModSpec(hullmodId);
         if (hullmod == null) return;
         for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
@@ -310,7 +334,7 @@ public final class ConcordAssembly extends BaseModPlugin {
         }
     }
     
-    public void removeHullmodEverywhere(String hullmodId) {
+    public static void removeHullmodEverywhere(String hullmodId) {
         HullModSpecAPI hullmod = Global.getSettings().getHullModSpec(hullmodId);
         if (hullmod == null) return;
         for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {

@@ -6,366 +6,405 @@ import java.util.List;
 import java.util.Set;
 
 import org.lwjgl.util.vector.Vector2f;
-import org.sutopia.starsector.mod.concord.MutableSpecAPI;
+import org.sutopia.starsector.mod.concord.blackops.Pacifier;
 
 import com.fs.starfarer.api.characters.MutableCharacterStatsAPI;
 import com.fs.starfarer.api.combat.ShieldAPI.ShieldType;
+import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
 import com.fs.starfarer.api.combat.ShipHullSpecAPI;
 import com.fs.starfarer.api.loading.WeaponSlotAPI;
 
-public abstract class MutableShipHullSpecAPI extends MutableSpecAPI<ShipHullSpecAPI> implements ShipHullSpecAPI {
+public class MutableShipHullSpecAPI implements ShipHullSpecAPI {
 
-    public MutableShipHullSpecAPI(ShipHullSpecAPI source) {
-        super(source);
+    private final Pacifier instance;
+    
+    public ShipHullSpecAPI getInstance() {
+        return instance.getInstance();
     }
     
-    public String getOriginalId() {
-        return original.getHullId();
+    public MutableShipHullSpecAPI(String id) {
+        instance = Pacifier.getShipHullSpecClone(id);
+    }
+    
+    public MutableShipHullSpecAPI(ShipHullSpecAPI spec) {
+        instance = Pacifier.getShipHullSpecClone(spec);
     }
 
-    public ShieldSpecAPI getShieldSpec() {
-        return original.getShieldSpec();
+    public void addBuiltInMod(String arg0) {
+        instance.addBuiltInMod(arg0);
     }
 
-    public ShieldType getDefenseType() {
-        return original.getDefenseType();
+    public void addBuiltInWeapon(String arg0, String arg1) {
+        instance.addBuiltInWeapon(arg0, arg1);
     }
 
-    public String getHullId() {
-        return original.getHullId();
+    public void addBuiltInWing(String arg0) {
+        instance.addBuiltInWing(arg0);
     }
 
-    public String getHullName() {
-        return original.getHullName();
+    public void addTag(String arg0) {
+        instance.addTag(arg0);
     }
 
-    public EnumSet<ShipTypeHints> getHints() {
-        return original.getHints();
+    public void applyToShip(ShipAPI ship) {
+        instance.applyToShip(ship);
     }
 
-    public float getNoCRLossTime() {
-        return original.getNoCRLossTime();
+    public ShipHullSpecAPI clone() {
+        return instance.clone();
     }
 
-    public float getCRToDeploy() {
-        return original.getCRToDeploy();
-    }
-
-    public float getCRLossPerSecond() {
-        return original.getCRLossPerSecond();
-    }
-
-    public float getBaseValue() {
-        return original.getBaseValue();
-    }
-
-    public int getOrdnancePoints(MutableCharacterStatsAPI stats) {
-        return original.getOrdnancePoints(stats);
-    }
-
-    public HullSize getHullSize() {
-        return original.getHullSize();
-    }
-
-    public float getHitpoints() {
-        return original.getHitpoints();
-    }
-
-    public float getArmorRating() {
-        return original.getArmorRating();
-    }
-
-    public float getFluxCapacity() {
-        return original.getFluxCapacity();
-    }
-
-    public float getFluxDissipation() {
-        return original.getFluxDissipation();
-    }
-
-    public ShieldType getShieldType() {
-        return original.getShieldType();
+    public boolean equals(Object obj) {
+        return instance.equals(obj);
     }
 
     public List<WeaponSlotAPI> getAllWeaponSlotsCopy() {
-        return original.getAllWeaponSlotsCopy();
+        return instance.getAllWeaponSlotsCopy();
     }
 
-    public String getSpriteName() {
-        return original.getSpriteName();
-    }
-
-    public boolean isCompatibleWithBase() {
-        return original.isCompatibleWithBase();
-    }
-
-    public String getBaseHullId() {
-        return original.getBaseHullId();
-    }
-
-    public float getBaseShieldFluxPerDamageAbsorbed() {
-        return original.getBaseShieldFluxPerDamageAbsorbed();
-    }
-
-    public String getHullNameWithDashClass() {
-        return original.getHullNameWithDashClass();
-    }
-
-    public boolean hasHullName() {
-        return original.hasHullName();
-    }
-
-    public float getBreakProb() {
-        return original.getBreakProb();
-    }
-
-    public float getMinPieces() {
-        return original.getMinPieces();
-    }
-
-    public float getMaxPieces() {
-        return original.getMaxPieces();
-    }
-
-    public int getFighterBays() {
-        return original.getFighterBays();
-    }
-
-    public float getMinCrew() {
-        return original.getMinCrew();
-    }
-
-    public float getMaxCrew() {
-        return original.getMaxCrew();
-    }
-
-    public float getCargo() {
-        return original.getCargo();
-    }
-
-    public float getFuel() {
-        return original.getFuel();
-    }
-
-    public float getFuelPerLY() {
-        return original.getFuelPerLY();
-    }
-
-    public boolean isDHull() {
-        return original.isDHull();
-    }
-
-    public boolean isDefaultDHull() {
-        return original.isDefaultDHull();
-    }
-
-    public void setDParentHullId(String dParentHullId) {
-        original.setDParentHullId(dParentHullId);
-    }
-
-    public String getDParentHullId() {
-        return original.getDParentHullId();
-    }
-
-    public ShipHullSpecAPI getDParentHull() {
-        return original.getDParentHull();
+    public float getArmorRating() {
+        return instance.getArmorRating();
     }
 
     public ShipHullSpecAPI getBaseHull() {
-        return original.getBaseHull();
+        return instance.getBaseHull();
     }
 
-    public List<String> getBuiltInWings() {
-        return original.getBuiltInWings();
+    public String getBaseHullId() {
+        return instance.getBaseHullId();
     }
 
-    public boolean isBuiltInWing(int index) {
-        return original.isBuiltInWing(index);
+    public float getBaseShieldFluxPerDamageAbsorbed() {
+        return instance.getBaseShieldFluxPerDamageAbsorbed();
     }
 
-    public String getDesignation() {
-        return original.getDesignation();
+    public float getBaseValue() {
+        return instance.getBaseValue();
     }
 
-    public boolean hasDesignation() {
-        return original.hasDesignation();
-    }
-
-    public boolean isRestoreToBase() {
-        return original.isRestoreToBase();
-    }
-
-    public void setRestoreToBase(boolean restoreToBase) {
-        original.setRestoreToBase(restoreToBase);
-    }
-
-    public Vector2f getModuleAnchor() {
-        return original.getModuleAnchor();
-    }
-
-    public void setModuleAnchor(Vector2f moduleAnchor) {
-        original.setModuleAnchor(moduleAnchor);
-    }
-
-    public void setCompatibleWithBase(boolean compatibleWithBase) {
-        original.setCompatibleWithBase(compatibleWithBase);
-    }
-
-    public Set<String> getTags() {
-        return original.getTags();
-    }
-
-    public void addTag(String tag) {
-        original.addTag(tag);
-    }
-
-    public boolean hasTag(String tag) {
-        return original.hasTag(tag);
-    }
-
-    public float getRarity() {
-        return original.getRarity();
-    }
-
-    public String getNameWithDesignationWithDashClass() {
-        return original.getNameWithDesignationWithDashClass();
-    }
-
-    public String getDescriptionId() {
-        return original.getDescriptionId();
-    }
-
-    public boolean isBaseHull() {
-        return original.isBaseHull();
-    }
-
-    public void setManufacturer(String manufacturer) {
-        original.setManufacturer(manufacturer);
-    }
-
-    public String getManufacturer() {
-        return original.getManufacturer();
-    }
-
-    public int getFleetPoints() {
-        return original.getFleetPoints();
+    public float getBreakProb() {
+        return instance.getBreakProb();
     }
 
     public List<String> getBuiltInMods() {
-        return original.getBuiltInMods();
-    }
-
-    public WeaponSlotAPI getWeaponSlotAPI(String slotId) {
-        return original.getWeaponSlotAPI(slotId);
-    }
-
-    public String getDescriptionPrefix() {
-        return original.getDescriptionPrefix();
-    }
-
-    public boolean isBuiltInMod(String modId) {
-        return original.isBuiltInMod(modId);
-    }
-
-    public void addBuiltInMod(String modId) {
-        original.addBuiltInMod(modId);
-    }
-
-    public boolean isCivilianNonCarrier() {
-        return original.isCivilianNonCarrier();
-    }
-
-    public void setHullName(String hullName) {
-        original.setHullName(hullName);
-    }
-
-    public void setDesignation(String designation) {
-        original.setDesignation(designation);
-    }
-
-    public boolean isPhase() {
-        return original.isPhase();
-    }
-
-    public String getShipFilePath() {
-        return original.getShipFilePath();
-    }
-
-    public String getTravelDriveId() {
-        return original.getTravelDriveId();
-    }
-
-    public void setTravelDriveId(String travelDriveId) {
-        original.setTravelDriveId(travelDriveId);
-    }
-
-    public EngineSpecAPI getEngineSpec() {
-        return original.getEngineSpec();
-    }
-
-    public float getSuppliesToRecover() {
-        return original.getSuppliesToRecover();
-    }
-
-    public void setSuppliesToRecover(float suppliesToRecover) {
-        original.setSuppliesToRecover(suppliesToRecover);
-    }
-
-    public float getSuppliesPerMonth() {
-        return original.getSuppliesPerMonth();
-    }
-
-    public void setSuppliesPerMonth(float suppliesPerMonth) {
-        original.setSuppliesPerMonth(suppliesPerMonth);
-    }
-
-    public void setRepairPercentPerDay(float repairPercentPerDay) {
-        original.setRepairPercentPerDay(repairPercentPerDay);
-    }
-
-    public void setCRToDeploy(float crToDeploy) {
-        original.setCRToDeploy(crToDeploy);
-    }
-
-    public float getNoCRLossSeconds() {
-        return original.getNoCRLossSeconds();
-    }
-
-    public void setNoCRLossSeconds(float noCRLossSeconds) {
-        original.setNoCRLossSeconds(noCRLossSeconds);
-    }
-
-    public void setCRLossPerSecond(float crLossPerSecond) {
-        original.setCRLossPerSecond(crLossPerSecond);
+        return instance.getBuiltInMods();
     }
 
     public HashMap<String, String> getBuiltInWeapons() {
-        return original.getBuiltInWeapons();
+        return instance.getBuiltInWeapons();
     }
 
-    public boolean isBuiltIn(String slotId) {
-        return original.isBuiltIn(slotId);
+    public List<String> getBuiltInWings() {
+        return instance.getBuiltInWings();
     }
 
-    public void addBuiltInWeapon(String slotId, String weaponId) {
-        original.addBuiltInWeapon(slotId, weaponId);
+    public float getCRLossPerSecond() {
+        return instance.getCRLossPerSecond();
+    }
+
+    public float getCRToDeploy() {
+        return instance.getCRToDeploy();
+    }
+
+    public float getCargo() {
+        return instance.getCargo();
+    }
+
+    public ShipHullSpecAPI getDParentHull() {
+        return instance.getDParentHull();
+    }
+
+    public String getDParentHullId() {
+        return instance.getDParentHullId();
+    }
+
+    public ShieldType getDefenseType() {
+        return instance.getDefenseType();
+    }
+
+    public String getDescriptionId() {
+        return instance.getDescriptionId();
+    }
+
+    public String getDescriptionPrefix() {
+        return instance.getDescriptionPrefix();
+    }
+
+    public String getDesignation() {
+        return instance.getDesignation();
+    }
+
+    public EngineSpecAPI getEngineSpec() {
+        return instance.getEngineSpec();
+    }
+
+    public int getFighterBays() {
+        return instance.getFighterBays();
+    }
+
+    public int getFleetPoints() {
+        return instance.getFleetPoints();
+    }
+
+    public float getFluxCapacity() {
+        return instance.getFluxCapacity();
+    }
+
+    public float getFluxDissipation() {
+        return instance.getFluxDissipation();
+    }
+
+    public float getFuel() {
+        return instance.getFuel();
+    }
+
+    public float getFuelPerLY() {
+        return instance.getFuelPerLY();
+    }
+
+    public EnumSet<ShipTypeHints> getHints() {
+        return instance.getHints();
+    }
+
+    public float getHitpoints() {
+        return instance.getHitpoints();
+    }
+
+    public String getHullId() {
+        return instance.getHullId();
+    }
+
+    public String getHullName() {
+        return instance.getHullName();
+    }
+
+    public String getHullNameWithDashClass() {
+        return instance.getHullNameWithDashClass();
+    }
+
+    public HullSize getHullSize() {
+        return instance.getHullSize();
+    }
+
+    public String getManufacturer() {
+        return instance.getManufacturer();
+    }
+
+    public float getMaxCrew() {
+        return instance.getMaxCrew();
+    }
+
+    public float getMaxPieces() {
+        return instance.getMaxPieces();
+    }
+
+    public float getMinCrew() {
+        return instance.getMinCrew();
+    }
+
+    public float getMinPieces() {
+        return instance.getMinPieces();
+    }
+
+    public Vector2f getModuleAnchor() {
+        return instance.getModuleAnchor();
+    }
+
+    public String getNameWithDesignationWithDashClass() {
+        return instance.getNameWithDesignationWithDashClass();
+    }
+
+    public float getNoCRLossSeconds() {
+        return instance.getNoCRLossSeconds();
+    }
+
+    public float getNoCRLossTime() {
+        return instance.getNoCRLossTime();
+    }
+
+    public int getOrdnancePoints(MutableCharacterStatsAPI arg0) {
+        return instance.getOrdnancePoints(arg0);
+    }
+
+    public float getRarity() {
+        return instance.getRarity();
+    }
+
+    public ShieldSpecAPI getShieldSpec() {
+        return instance.getShieldSpec();
+    }
+
+    public ShieldType getShieldType() {
+        return instance.getShieldType();
     }
 
     public String getShipDefenseId() {
-        return original.getShipDefenseId();
+        return instance.getShipDefenseId();
     }
 
-    public void setShipDefenseId(String shipDefenseId) {
-        original.setShipDefenseId(shipDefenseId);
+    public String getShipFilePath() {
+        return instance.getShipFilePath();
     }
 
     public String getShipSystemId() {
-        return original.getShipSystemId();
+        return instance.getShipSystemId();
     }
 
-    public void setShipSystemId(String shipSystemId) {
-        original.setShipSystemId(shipSystemId);
+    public String getSpriteName() {
+        return instance.getSpriteName();
+    }
+
+    public float getSuppliesPerMonth() {
+        return instance.getSuppliesPerMonth();
+    }
+
+    public float getSuppliesToRecover() {
+        return instance.getSuppliesToRecover();
+    }
+
+    public Set<String> getTags() {
+        return instance.getTags();
+    }
+
+    public String getTravelDriveId() {
+        return instance.getTravelDriveId();
+    }
+
+    public WeaponSlotAPI getWeaponSlotAPI(String arg0) {
+        return instance.getWeaponSlotAPI(arg0);
+    }
+
+    public boolean hasDesignation() {
+        return instance.hasDesignation();
+    }
+
+    public boolean hasHullName() {
+        return instance.hasHullName();
+    }
+
+    public boolean hasTag(String arg0) {
+        return instance.hasTag(arg0);
+    }
+
+    public int hashCode() {
+        return instance.hashCode();
+    }
+
+    public boolean isBaseHull() {
+        return instance.isBaseHull();
+    }
+
+    public boolean isBuiltIn(String arg0) {
+        return instance.isBuiltIn(arg0);
+    }
+
+    public boolean isBuiltInMod(String arg0) {
+        return instance.isBuiltInMod(arg0);
+    }
+
+    public boolean isBuiltInWing(int arg0) {
+        return instance.isBuiltInWing(arg0);
+    }
+
+    public boolean isCivilianNonCarrier() {
+        return instance.isCivilianNonCarrier();
+    }
+
+    public boolean isCompatibleWithBase() {
+        return instance.isCompatibleWithBase();
+    }
+
+    public boolean isDHull() {
+        return instance.isDHull();
+    }
+
+    public boolean isDefaultDHull() {
+        return instance.isDefaultDHull();
+    }
+
+    public boolean isPhase() {
+        return instance.isPhase();
+    }
+
+    public boolean isRestoreToBase() {
+        return instance.isRestoreToBase();
+    }
+
+    public void setCRLossPerSecond(float arg0) {
+        instance.setCRLossPerSecond(arg0);
+    }
+
+    public void setCRToDeploy(float arg0) {
+        instance.setCRToDeploy(arg0);
+    }
+
+    public void setCompatibleWithBase(boolean arg0) {
+        instance.setCompatibleWithBase(arg0);
+    }
+
+    public void setDParentHullId(String arg0) {
+        instance.setDParentHullId(arg0);
+    }
+
+    public void setDesignation(String arg0) {
+        instance.setDesignation(arg0);
+    }
+
+    public void setFighterBays(int arg0) {
+        instance.setFighterBays(arg0);
+    }
+
+    public void setHullId(String arg0) {
+        instance.setHullId(arg0);
+    }
+
+    public void setHullName(String arg0) {
+        instance.setHullName(arg0);
+    }
+
+    public void setManufacturer(String arg0) {
+        instance.setManufacturer(arg0);
+    }
+
+    public void setModuleAnchor(Vector2f arg0) {
+        instance.setModuleAnchor(arg0);
+    }
+
+    public void setNoCRLossSeconds(float arg0) {
+        instance.setNoCRLossSeconds(arg0);
+    }
+
+    public void setRepairPercentPerDay(float arg0) {
+        instance.setRepairPercentPerDay(arg0);
+    }
+
+    public void setRestoreToBase(boolean arg0) {
+        instance.setRestoreToBase(arg0);
+    }
+
+    public void setShipDefenseId(String arg0) {
+        instance.setShipDefenseId(arg0);
+    }
+
+    public void setShipSystemId(String arg0) {
+        instance.setShipSystemId(arg0);
+    }
+
+    public void setSuppliesPerMonth(float arg0) {
+        instance.setSuppliesPerMonth(arg0);
+    }
+
+    public void setSuppliesToRecover(float arg0) {
+        instance.setSuppliesToRecover(arg0);
+    }
+
+    public void setTravelDriveId(String arg0) {
+        instance.setTravelDriveId(arg0);
+    }
+
+    public String toString() {
+        return instance.toString();
     }
 
 }

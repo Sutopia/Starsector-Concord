@@ -41,6 +41,8 @@ public class Codex {
     public static final String TOPIC_ROTATE = "forced_rotation";
     // do not back off
     public static final String TOPIC_AI = "ai_flag";
+    // used for hullmods that changes fighter specs
+    public static final String TOPIC_FIGHTER_SPEC_CHANGE = "fighter_conversion";
     
     
     // legacy implementations
