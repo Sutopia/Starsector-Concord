@@ -3,7 +3,7 @@
     "name": "Concord",
     "author": "Sutopia",
     "utility": "false",
-    "version": "3.5.1a",
+    "version": "3.5.1c",
     "description": "Spec specialty support",
     "gameVersion": "0.95.1a-RC6",
 	"jars": ["jar/ConcordMod.jar","jar/ConcordCovert.jar"],
