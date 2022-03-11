@@ -10,6 +10,8 @@ public class Codex {
     // if someone manage to somehow F this up it must be intentional
     public static final String ID_PREFIX_CONCORD_DOPPELGANGER = "concord_";
     public static final String TAG_CONCORD_OPT_IN = "auto_concord";
+    public static final String TAG_CONCORD_IMPLICIT = "implicit_concord";
+    public static final String TAG_CONCORD_SHELLED = "concord_fully_processed";
     
     public static final String TAG_OWN_TOPIC = "vanilla_auto_concord";
     
@@ -44,6 +46,9 @@ public class Codex {
     // used for hullmods that changes fighter specs
     public static final String TOPIC_FIGHTER_SPEC_CHANGE = "fighter_conversion";
     
+    // dynamic mod Id for ordnance point manipulation
+    // use stats.getDynamic().getMod(Codex.ORDNANCE_POINT_MOD)
+    public static final String ORDNANCE_POINT_MOD = "concord_ordnance_point_mod";
     
     // legacy implementations
     public static final String VANILLA_EXCLUSIVE_PREFIX = "vEx_";

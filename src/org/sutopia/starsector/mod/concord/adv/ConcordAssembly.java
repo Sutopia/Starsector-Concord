@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.json.JSONObject;
 import org.sutopia.starsector.mod.concord.Codex;
 import org.sutopia.starsector.mod.concord.api.OnInstallHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.OnRemoveHullmodEffect;
@@ -12,6 +11,7 @@ import org.sutopia.starsector.mod.concord.api.SelectiveTransientHullmod;
 import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.GlobalTransientHullmod;
 import org.sutopia.starsector.mod.concord.blackops.Monitor;
+import org.sutopia.starsector.mod.concord.dynamic.ConcordUtil;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
@@ -60,35 +60,7 @@ public final class ConcordAssembly extends BaseModPlugin {
                     continue;
                 }
                 Global.getSettings().getAllSpecs(spec.getClass()).remove(spec);
-
-                // copy og spec to doppelganger
-                for (String tag : original.getTags()) {
-                    if (!spec.hasTag(tag)) {
-                        spec.addTag(tag);
-                    }
-                }
-
-                for (String tag : original.getUITags()) {
-                    if (!spec.hasUITag(tag)) {
-                        spec.addUITag(tag);
-                    }
-                }
-
-                spec.setAlwaysUnlocked(original.isAlwaysUnlocked());
-                spec.setBaseValue(original.getBaseValue());
-                spec.setCapitalCost(original.getCapitalCost());
-                spec.setCruiserCost(original.getCruiserCost());
-                spec.setDescriptionFormat(original.getDescriptionFormat());
-                spec.setDestroyerCost(original.getDestroyerCost());
-                spec.setDisplayName(original.getDisplayName());
-                spec.setFrigateCost(original.getFrigateCost());
-                spec.setHidden(original.isHidden());
-                spec.setHiddenEverywhere(original.isHiddenEverywhere());
-                spec.setManufacturer(original.getManufacturer());
-                spec.setRarity(original.getRarity());
-                spec.setSpriteName(original.getSpriteName());
-                spec.setTier(original.getTier());
-                
+                ConcordUtil.copySpec(original, spec);
                 // swap
                 original.setHidden(true);
                 String id = original.getId();
@@ -96,6 +68,18 @@ public final class ConcordAssembly extends BaseModPlugin {
                 spec.setId(id);
                 Global.getSettings().getAllSpecs(original.getClass()).remove(original);
                 Global.getSettings().putSpec(original.getClass(), id, spec);
+            } else if (spec.hasTag(Codex.TAG_CONCORD_OPT_IN) 
+                    && spec.hasTag(Codex.TAG_CONCORD_IMPLICIT)
+                    && !spec.hasTag(Codex.TAG_CONCORD_SHELLED)
+                    && spec.getId() != null) {
+                HullModSpecAPI shellSpec = Monitor.CreateModSpec(DataEnactDomain.class.getName());
+                ConcordUtil.copySpec(spec, shellSpec);
+                shellSpec.addTag(Codex.TAG_CONCORD_SHELLED);
+                spec.setHidden(true);
+                String id = spec.getId();
+                DataEnactDomain.sanctuary.put(id, spec.getEffect());
+                Global.getSettings().getAllSpecs(spec.getClass()).remove(spec);
+                Global.getSettings().putSpec(spec.getClass(), id, shellSpec);
             }
         }
 
@@ -167,50 +151,13 @@ public final class ConcordAssembly extends BaseModPlugin {
         ShipSystemSpecAPI vanillaPhase = Global.getSettings().getShipSystemSpec("phasecloak");
         for (ShipSystemSpecAPI spec : Global.getSettings().getAllShipSystemSpecs()) {
             if (vanillaPhase.getStatsScriptClassName().equals(spec.getStatsScriptClassName())) {
-                JSONObject specJson = spec.getSpecJson();
-                specJson.remove("statsScript");
-                specJson.put("statsScript", concordPhase.getStatsScriptClassName());
-                ShipSystemSpecAPI concordSpec = Monitor.CreateSysSpec(specJson);
-                concordSpec.setName(spec.getName());
-                concordSpec.setId(spec.getId());
-                concordSpec.setActive(spec.getActive());
-                concordSpec.setCanNotCauseOverload(spec.isCanNotCauseOverload());
-                concordSpec.setCanUseWhileRightClickSystemOn(spec.isCanUseWhileRightClickSystemOn());
-                concordSpec.setCooldown(spec.getCooldown(null));
-                concordSpec.setCrPerUse(spec.getCrPerUse());
-                concordSpec.setDissipationAllowed(spec.isDissipationAllowed());
-                concordSpec.setFiringAllowed(spec.isFiringAllowed());
-                concordSpec.setFluxPerSecond(spec.getFluxPerSecond());
-                concordSpec.setFluxPerSecondBaseCap(spec.getFluxPerSecondBaseCap());
-                concordSpec.setFluxPerSecondBaseRate(spec.getFluxPerSecondBaseRate());
-                concordSpec.setFluxPerUse(spec.getFluxPerUse());
-                concordSpec.setFluxPerUseBaseCap(spec.getFluxPerUseBaseCap());
-                concordSpec.setFluxPerUseBaseRate(spec.getFluxPerUseBaseRate());
-                concordSpec.setGeneratesHardFlux(spec.generatesHardFlux());
-                concordSpec.setHardDissipationAllowed(spec.isHardDissipationAllowed());
-                concordSpec.setIconSpriteName(spec.getIconSpriteName());
-                concordSpec.setIn(spec.getIn());
-                concordSpec.setMaxUses(spec.getMaxUses(null));
-                concordSpec.setOut(spec.getOut());
-                concordSpec.setOutOfUsesSound(spec.getOutOfUsesSound());
-                concordSpec.setPhaseChargedownVulnerabilityFraction(spec.getPhaseChargedownVulnerabilityFraction());
-                concordSpec.setPhaseCloak(spec.isPhaseCloak());
-                concordSpec.setRegen(spec.getRegen(null));
-                concordSpec.setRequiresZeroFluxBoost(spec.isRequiresZeroFluxBoost());
-                concordSpec.setShieldAllowed(spec.isShieldAllowed());
-                concordSpec.setStrafeAllowed(spec.isStrafeAllowed());
-                concordSpec.setToggle(spec.isToggle());
-                concordSpec.setTriggersExtraEngines(spec.isTriggersExtraEngines());
-                concordSpec.setTurningAllowed(spec.isTurningAllowed());
-                concordSpec.setUseSound(spec.getUseSound());
-                concordSpec.setVentingAllowed(spec.isVentingAllowed());
-                concordSpec.setWeaponId(spec.getWeaponId());
-                //concordSpec.setId(spec.getId());
+                ShipSystemSpecAPI concordSpec = Monitor.CreateSysSpec(spec, concordPhase.getStatsScriptClassName());
+                ConcordUtil.copySpec(spec, concordSpec);
                 Global.getSettings().getAllSpecs(spec.getClass()).remove(spec);
                 Global.getSettings().putSpec(spec.getClass(), spec.getId(), concordSpec);
             }
         }
-
+        Global.getSettings().getAllSpecs(concordPhase.getClass()).remove(concordPhase);
         // Shell for S-Mod display correction
         // Global.setSettings(new ConcordSettings(Global.getSettings()));
         DataEnactDomain.resetCache();

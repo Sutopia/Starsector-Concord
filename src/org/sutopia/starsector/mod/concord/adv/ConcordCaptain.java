@@ -13,6 +13,7 @@ import org.sutopia.starsector.mod.concord.api.FighterInducedEffect;
 import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.GlobalTransientHullmod;
 import org.sutopia.starsector.mod.concord.api.WeaponInducedEffect;
+import org.sutopia.starsector.mod.concord.dynamic.MutableShipHullSpecAPI;
 
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.combat.BaseHullMod;
@@ -136,16 +137,28 @@ public class ConcordCaptain extends BaseHullMod implements GlobalTransientHullmo
         
         for (String hullmod : ship.getVariant().getHullMods()) {
             HullModSpecAPI modSpec = Global.getSettings().getHullModSpec(hullmod);
-            if (modSpec.hasTag(Codex.VOLATILE_EXCLUSIVE_PREFIX + Codex.TOPIC_FIGHTER_SPEC_CHANGE)) {
-                return;
+            if (!modSpec.hasTag(Codex.VOLATILE_EXCLUSIVE_PREFIX + Codex.TOPIC_FIGHTER_SPEC_CHANGE)) {
+                for (int i = 0; i < ship.getVariant().getWings().size(); i++) {
+                    String wingSpec = ship.getVariant().getWingId(i);
+                    if (wingSpec != null && ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.containsKey(wingSpec)) {
+                        ship.getVariant().setWingId(i, ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.get(wingSpec));
+                    }
+                }
             }
         }
-        for (int i = 0; i < ship.getVariant().getWings().size(); i++) {
-            String wingSpec = ship.getVariant().getWingId(i);
-            if (wingSpec != null && ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.containsKey(wingSpec)) {
-                ship.getVariant().setWingId(i, ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.get(wingSpec));
+        
+        if (Global.getSector() != null && Global.getSector().getPlayerStats() != null) {
+            int current = ship.getHullSpec().getOrdnancePoints(Global.getSector().getPlayerStats());
+            int original = Global.getSettings().getHullSpec(ship.getHullSpec().getHullId())
+                    .getOrdnancePoints(Global.getSector().getPlayerStats());
+            int expected = (int) Math.floor(ship.getMutableStats().getDynamic().getMod(Codex.ORDNANCE_POINT_MOD).computeEffective(original));
+            if (current != expected) {
+                MutableShipHullSpecAPI spec = ConcordDynamicInstanceAssembly.getHullSpecCopy(ship.getHullSpec());
+                spec.setOrdnancePoints(expected);
+                spec.applyToShip(ship);
             }
         }
+        
     }
 
     @Override

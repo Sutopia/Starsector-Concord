@@ -17,18 +17,18 @@ import com.fs.starfarer.api.loading.WeaponSlotAPI;
 
 public class MutableShipHullSpecAPI implements ShipHullSpecAPI {
 
-    private final Pacifier instance;
+    private final Pacifier.HullSpec instance;
     
     public ShipHullSpecAPI getInstance() {
         return instance.getInstance();
     }
     
     public MutableShipHullSpecAPI(String id) {
-        instance = Pacifier.getShipHullSpecClone(id);
+        instance = Pacifier.HullSpec.getShipHullSpecClone(id);
     }
     
     public MutableShipHullSpecAPI(ShipHullSpecAPI spec) {
-        instance = Pacifier.getShipHullSpecClone(spec);
+        instance = Pacifier.HullSpec.getShipHullSpecClone(spec);
     }
 
     public void addBuiltInMod(String arg0) {
@@ -49,10 +49,6 @@ public class MutableShipHullSpecAPI implements ShipHullSpecAPI {
 
     public void applyToShip(ShipAPI ship) {
         instance.applyToShip(ship);
-    }
-
-    public ShipHullSpecAPI clone() {
-        return instance.clone();
     }
 
     public boolean equals(Object obj) {
@@ -355,10 +351,6 @@ public class MutableShipHullSpecAPI implements ShipHullSpecAPI {
         instance.setFighterBays(arg0);
     }
 
-    public void setHullId(String arg0) {
-        instance.setHullId(arg0);
-    }
-
     public void setHullName(String arg0) {
         instance.setHullName(arg0);
     }
@@ -405,6 +397,18 @@ public class MutableShipHullSpecAPI implements ShipHullSpecAPI {
 
     public String toString() {
         return instance.toString();
+    }
+
+    public void setDescriptionId(String arg0) {
+        instance.setDescriptionId(arg0);
+    }
+
+    public void setDescriptionPrefix(String arg0) {
+        instance.setDescriptionPrefix(arg0);
+    }
+
+    public void setOrdnancePoints(int arg0) {
+        instance.setOrdnancePoints(arg0);
     }
 
 }
