@@ -4,7 +4,8 @@ public class Codex {
     // concord ids
     //public static final String CONCORD_PHASE_SYSTEM_ID = "concord_mod_phasecloak";
     public static final String CONCORD_PHASE_SYSTEM_GEN_PREFIX = "concord_mod_";
-    public static final String CONCORD_CAPTAIN_HULLMOD_ID = "concord_captain";
+    
+    public static final String CONCORD_FACTION_HULLMOD_KNOWN_KEY = "concord_faction_hullmod_";
     
     // concord implement *double* check
     // if someone manage to somehow F this up it must be intentional

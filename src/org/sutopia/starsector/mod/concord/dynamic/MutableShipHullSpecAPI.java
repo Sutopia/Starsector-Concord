@@ -411,4 +411,8 @@ public class MutableShipHullSpecAPI implements ShipHullSpecAPI {
         instance.setOrdnancePoints(arg0);
     }
 
+    public void setHullSize(HullSize arg0) {
+        instance.setHullSize(arg0);
+    }
+
 }

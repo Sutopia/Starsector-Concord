@@ -143,6 +143,7 @@ public final class ConcordDynamicInstanceAssembly {
      */
     public static HullVariantSpec getVariantCopy(String id, ShipVariantAPI spec, boolean keepSMod) throws Throwable {
         HullVariantSpec specCopy = Marshal.getEmptyShipVariant(id, spec.getHullSpec());
+        specCopy.setHullVariantId(id);
         specCopy.setSource(VariantSource.STOCK);
         
         if (keepSMod) {

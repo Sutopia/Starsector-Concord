@@ -12,11 +12,13 @@ import org.sutopia.starsector.mod.concord.api.TrackedHullmodEffect;
 import org.sutopia.starsector.mod.concord.api.GlobalTransientHullmod;
 import org.sutopia.starsector.mod.concord.blackops.Monitor;
 import org.sutopia.starsector.mod.concord.dynamic.ConcordUtil;
+import org.sutopia.starsector.mod.concord.dynamic.MutableShipHullSpecAPI;
 
 import com.fs.starfarer.api.BaseModPlugin;
 import com.fs.starfarer.api.Global;
 import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.CargoAPI;
+import com.fs.starfarer.api.campaign.FactionAPI;
 import com.fs.starfarer.api.campaign.FleetDataAPI;
 import com.fs.starfarer.api.campaign.LocationAPI;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
@@ -37,16 +39,35 @@ public final class ConcordAssembly extends BaseModPlugin {
             Global.getSettings().getHullModSpec("concord_captain").setHiddenEverywhere(false);
         }
 
-        for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
-            if (!spec.isBuiltInMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID)) {
-                spec.addBuiltInMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID);
-            }
-        }
+        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            if (spec.getEffect() instanceof GlobalTransientHullmod) {
+                HullModSpecAPI hullmod = Global.getSettings().getHullModSpec(spec.getId());
+                if (hullmod == null) return;
+                for (ShipHullSpecAPI hullSpec : Global.getSettings().getAllShipHullSpecs()) {
+                    if (hullSpec.isDHull()) {
+                        continue;
+                    }
+                    if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
+                        if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToSpec(hullSpec)) {
+                            continue;
+                        }
+                    }
+                    if (!hullSpec.isBuiltInMod(spec.getId())) {
+                        hullSpec.addBuiltInMod(spec.getId());
+                    }
+                }
 
-        for (String id : Global.getSettings().getAllVariantIds()) {
-            ShipVariantAPI variant = Global.getSettings().getVariant(id);
-            if (!variant.hasHullMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID)) {
-                variant.addPermaMod(Codex.CONCORD_CAPTAIN_HULLMOD_ID, false);
+                for (String id : Global.getSettings().getAllVariantIds()) {
+                    ShipVariantAPI variant = Global.getSettings().getVariant(id);
+                    if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
+                        if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToVariant(variant)) {
+                            continue;
+                        }
+                    }
+                    if (!variant.hasHullMod(spec.getId())) {
+                        variant.addPermaMod(spec.getId(), false);
+                    }
+                }
             }
         }
         
@@ -212,9 +233,13 @@ public final class ConcordAssembly extends BaseModPlugin {
     
     @Override
     public void beforeGameSave() {
-        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
-            if (spec.getEffect() instanceof GlobalTransientHullmod) {
-                removeHullmodEverywhere(spec.getId());
+        boolean hasPurge = true;
+        while (hasPurge) {
+            hasPurge = false;
+            for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+                if (spec.getEffect() instanceof GlobalTransientHullmod) {
+                    hasPurge |= removeHullmodEverywhere(spec.getId());
+                }
             }
         }
     }
@@ -222,14 +247,17 @@ public final class ConcordAssembly extends BaseModPlugin {
     public static void addHullmodEverywhere(String hullmodId) {
         HullModSpecAPI hullmod = Global.getSettings().getHullModSpec(hullmodId);
         if (hullmod == null) return;
-        for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
+        for (ShipHullSpecAPI hullSpec : Global.getSettings().getAllShipHullSpecs()) {
+            if (hullSpec.isDHull()) {
+                continue;
+            }
             if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
-                if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToSpec(spec)) {
+                if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToSpec(hullSpec)) {
                     continue;
                 }
             }
-            if (!spec.isBuiltInMod(hullmodId)) {
-                spec.addBuiltInMod(hullmodId);
+            if (!hullSpec.isBuiltInMod(hullmodId)) {
+                hullSpec.addBuiltInMod(hullmodId);
             }
         }
 
@@ -245,18 +273,39 @@ public final class ConcordAssembly extends BaseModPlugin {
             }
         }
         
+        for (FactionAPI faction : Global.getSector().getAllFactions()) {
+            Object obj = Global.getSector().getPersistentData()
+                    .get(Codex.CONCORD_FACTION_HULLMOD_KNOWN_KEY + faction.getId() + hullmodId);
+            if (obj != null) {
+                faction.addKnownHullMod(hullmodId);
+            }
+        }
+        FactionAPI playerFaction = Global.getSector().getPlayerFaction();
+        if (playerFaction != null) {
+            Object obj = Global.getSector().getPersistentData()
+                    .get(Codex.CONCORD_FACTION_HULLMOD_KNOWN_KEY + playerFaction.getId() + hullmodId);
+            if (obj != null) {
+                playerFaction.addKnownHullMod(hullmodId);
+            }
+        }
+        
         for (LocationAPI loc : Global.getSector().getAllLocations()) {
             for (CampaignFleetAPI fleet : loc.getFleets()) {
-                for (FleetMemberAPI member : fleet.getFleetData().getMembersListCopy()) {
-                    ShipVariantAPI variant = member.getVariant();
-                    if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
-                        if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToVariant(variant)) {
-                            continue;
-                        }
+                for (FleetMemberAPI member : fleet.getMembersWithFightersCopy()) {
+                    infest(member.getVariant(), hullmod);
+                }
+                CargoAPI cargo = fleet.getCargo();
+                if (cargo == null) continue;
+                FleetDataAPI fleetData = cargo.getMothballedShips();
+                if (fleetData != null) {
+                    for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
+                        infest(member.getVariant(), hullmod);
                     }
-                    if (!variant.hasHullMod(hullmodId)) {
-                        variant.addPermaMod(hullmodId, false);
-                    }
+                }
+                fleetData = cargo.getFleetData();
+                if (fleetData == null) continue;
+                for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
+                    infest(member.getVariant(), hullmod);
                 }
             }
             for (MarketAPI market : Global.getSector().getEconomy().getMarkets(loc)) {
@@ -264,65 +313,128 @@ public final class ConcordAssembly extends BaseModPlugin {
                     CargoAPI cargo = sub.getCargo();
                     if (cargo == null) continue;
                     FleetDataAPI fleetData = cargo.getFleetData();
+                    if (fleetData != null) {
+                        for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
+                            ShipVariantAPI variant = member.getVariant();
+                            infest(variant, hullmod);
+                        }
+                    }
+                    fleetData = cargo.getMothballedShips();
                     if (fleetData == null) continue;
                     for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
                         ShipVariantAPI variant = member.getVariant();
-                        if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
-                            if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToVariant(variant)) {
-                                continue;
-                            }
-                        }
-                        if (!variant.hasHullMod(hullmodId)) {
-                            variant.addPermaMod(hullmodId, false);
-                        }
+                        infest(variant, hullmod);
                     }
                 }
             }
         }
+        
+        for (FleetMemberAPI member : Global.getSector().getPlayerFleet().getFleetData().getMembersListCopy()) {
+            ShipVariantAPI variant = member.getVariant();
+            infest(variant, hullmod);
+        }
     }
     
-    public static void removeHullmodEverywhere(String hullmodId) {
+    private static void infest(ShipVariantAPI variant, HullModSpecAPI hullmod) {
+        if (hullmod.getEffect() instanceof SelectiveTransientHullmod) {
+            if (!((SelectiveTransientHullmod)hullmod.getEffect()).shouldApplyToVariant(variant)) {
+                return;
+            }
+        }
+        if (!variant.hasHullMod(hullmod.getId())) {
+            variant.addPermaMod(hullmod.getId(), false);
+        }
+    }
+    
+    public static boolean removeHullmodEverywhere(String hullmodId) {
         HullModSpecAPI hullmod = Global.getSettings().getHullModSpec(hullmodId);
-        if (hullmod == null) return;
-        for (ShipHullSpecAPI spec : Global.getSettings().getAllShipHullSpecs()) {
-            if (spec.isBuiltInMod(hullmodId)) {
-                spec.getBuiltInMods().remove(hullmodId);
+        if (hullmod == null) return false;
+        boolean hasPurge = false;
+        for (ShipHullSpecAPI hullSpec : Global.getSettings().getAllShipHullSpecs()) {
+            if (hullSpec.isBuiltInMod(hullmodId)) {
+                hullSpec.getBuiltInMods().remove(hullmodId);
+                hasPurge = true;
             }
         }
 
         for (String id : Global.getSettings().getAllVariantIds()) {
             ShipVariantAPI variant = Global.getSettings().getVariant(id);
             if (variant.hasHullMod(hullmodId)) {
-                variant.removeMod(hullmodId);
-                variant.removePermaMod(hullmodId);
+                hasPurge |= purge(variant, hullmodId);
+            }
+        }
+        
+        for (FactionAPI faction : Global.getSector().getAllFactions()) {
+            if (faction.knowsHullMod(hullmodId)) {
+                Global.getSector().getPersistentData()
+                        .put(Codex.CONCORD_FACTION_HULLMOD_KNOWN_KEY + faction.getId() + hullmodId, "1");
+                faction.removeKnownHullMod(hullmodId);
+            }
+        }
+        FactionAPI playerFaction = Global.getSector().getPlayerFaction();
+        if (playerFaction != null) {
+            if (playerFaction.knowsHullMod(hullmodId)) {
+                Global.getSector().getPersistentData()
+                        .put(Codex.CONCORD_FACTION_HULLMOD_KNOWN_KEY + playerFaction.getId() + hullmodId, "1");
+                playerFaction.removeKnownHullMod(hullmodId);
             }
         }
         
         for (LocationAPI loc : Global.getSector().getAllLocations()) {
             for (CampaignFleetAPI fleet : loc.getFleets()) {
-                for (FleetMemberAPI member : fleet.getFleetData().getMembersListCopy()) {
-                    ShipVariantAPI variant = member.getVariant();
-                    if (variant.hasHullMod(hullmodId)) {
-                        variant.removeMod(hullmodId);
-                        variant.removePermaMod(hullmodId);
+                for (FleetMemberAPI member : fleet.getMembersWithFightersCopy()) {
+                    hasPurge |= purge(member.getVariant(), hullmodId);
+                }
+                CargoAPI cargo = fleet.getCargo();
+                if (cargo == null) continue;
+                FleetDataAPI fleetData = cargo.getMothballedShips();
+                if (fleetData != null) {
+                    for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
+                        hasPurge |= purge(member.getVariant(), hullmodId);
                     }
                 }
+                fleetData = cargo.getFleetData();
+                if (fleetData == null) continue;
+                for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
+                    hasPurge |= purge(member.getVariant(), hullmodId);
+                }
             }
+            
             for (MarketAPI market : Global.getSector().getEconomy().getMarkets(loc)) {
                 for (SubmarketAPI sub : market.getSubmarketsCopy()) {
                     CargoAPI cargo = sub.getCargo();
                     if (cargo == null) continue;
-                    FleetDataAPI fleetData = cargo.getFleetData();
+                    FleetDataAPI fleetData = cargo.getMothballedShips();
+                    if (fleetData != null) {
+                        for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
+                            hasPurge |= purge(member.getVariant(), hullmodId);
+                        }
+                    }
+                    fleetData = cargo.getFleetData();
                     if (fleetData == null) continue;
                     for (FleetMemberAPI member : fleetData.getMembersListCopy()) {
-                        ShipVariantAPI variant = member.getVariant();
-                        if (variant.hasHullMod(hullmodId)) {
-                            variant.removeMod(hullmodId);
-                            variant.removePermaMod(hullmodId);
-                        }
+                        hasPurge |= purge(member.getVariant(), hullmodId);
                     }
                 }
             }
         }
+        CampaignFleetAPI player = Global.getSector().getPlayerFleet();
+        for (FleetMemberAPI member : player.getMembersWithFightersCopy()) {
+            hasPurge |= purge(member.getVariant(), hullmodId);
+        }
+        return hasPurge;
+    }
+    
+    private static boolean purge(ShipVariantAPI variant, String hullmodId) {
+        if (variant.hasHullMod(hullmodId)) {
+            variant.removeMod(hullmodId);
+            variant.removePermaMod(hullmodId);
+            variant.getHullSpec().getBuiltInMods().remove(hullmodId);
+            MutableShipHullSpecAPI hullSpec = ConcordDynamicInstanceAssembly.getHullSpecCopy(variant.getHullSpec());
+            hullSpec.getBuiltInMods().remove(hullmodId);
+            variant.setHullSpecAPI(hullSpec.getInstance());
+            return true;
+        }
+        return false;
     }
 }
