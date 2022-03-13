@@ -39,7 +39,7 @@ public class ConcordCommander extends BaseCampaignEventListener {
         revertFighters();
     }
     
-    private void revertFighters() {
+    public static void revertFighters() {
         CampaignFleetAPI fleet = Global.getSector().getPlayerFleet();
         if (fleet != null) {
             HashMap<String, Integer> addBack = new HashMap<>();

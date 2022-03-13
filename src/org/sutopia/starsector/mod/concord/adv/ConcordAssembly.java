@@ -39,7 +39,12 @@ public final class ConcordAssembly extends BaseModPlugin {
             Global.getSettings().getHullModSpec("concord_captain").setHiddenEverywhere(false);
         }
 
-        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+        for (final HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+            try {
+                spec.getEffect();
+            } catch (Exception e) {
+                continue;
+            }
             if (spec.getEffect() instanceof GlobalTransientHullmod) {
                 HullModSpecAPI hullmod = Global.getSettings().getHullModSpec(spec.getId());
                 if (hullmod == null) return;
@@ -68,6 +73,30 @@ public final class ConcordAssembly extends BaseModPlugin {
                         variant.addPermaMod(spec.getId(), false);
                     }
                 }
+            }
+            // register tracked hullmods
+            if (spec.getEffect() instanceof TrackedHullmodEffect) {
+                ConcordCaptain.trackedHullmods.put(spec.getId(), (TrackedHullmodEffect) spec.getEffect());
+            } else if (spec.getEffect() instanceof OnInstallHullmodEffect) {
+                ConcordCaptain.trackedHullmods.put(spec.getId(), new TrackedHullmodEffect() {
+                    @Override
+                    public void onInstall(ShipAPI ship) {
+                        ((OnInstallHullmodEffect)spec.getEffect()).onInstall(ship);
+                    }
+                    @Override
+                    public void onRemove(ShipAPI ship) {
+                    }
+                });
+            } else if (spec.getEffect() instanceof OnRemoveHullmodEffect) {
+                ConcordCaptain.trackedHullmods.put(spec.getId(), new TrackedHullmodEffect() {
+                    @Override
+                    public void onInstall(ShipAPI ship) {
+                    }
+                    @Override
+                    public void onRemove(ShipAPI ship) {
+                        ((OnRemoveHullmodEffect)spec.getEffect()).onRemove(ship);
+                    }
+                });
             }
         }
         
@@ -191,34 +220,6 @@ public final class ConcordAssembly extends BaseModPlugin {
                 addHullmodEverywhere(spec.getId());
             }
         }
-
-        // register tracked hullmods
-        for (final HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
-            if (spec.getEffect() instanceof TrackedHullmodEffect) {
-                ConcordCaptain.trackedHullmods.put(spec.getId(), (TrackedHullmodEffect) spec.getEffect());
-            } else if (spec.getEffect() instanceof OnInstallHullmodEffect) {
-                ConcordCaptain.trackedHullmods.put(spec.getId(), new TrackedHullmodEffect() {
-                    @Override
-                    public void onInstall(ShipAPI ship) {
-                        ((OnInstallHullmodEffect)spec.getEffect()).onInstall(ship);
-                    }
-                    @Override
-                    public void onRemove(ShipAPI ship) {
-                    }
-                });
-            } else if (spec.getEffect() instanceof OnRemoveHullmodEffect) {
-                ConcordCaptain.trackedHullmods.put(spec.getId(), new TrackedHullmodEffect() {
-                    @Override
-                    public void onInstall(ShipAPI ship) {
-                    }
-                    @Override
-                    public void onRemove(ShipAPI ship) {
-                        ((OnRemoveHullmodEffect)spec.getEffect()).onRemove(ship);
-                    }
-                });
-            }
-        }
-        
         Global.getSector().addTransientListener(new ConcordCommander());
     }
     

@@ -97,6 +97,7 @@ public class ConcordCaptain extends BaseHullMod implements GlobalTransientHullmo
         if (shipId == null) {
             return;
         }
+        //ConcordCommander.revertFighters();
 
         ArrayList<TrackedHullmodEffect> removeEffects = new ArrayList<>();
         ArrayList<TrackedHullmodEffect> installEffects = new ArrayList<>();
@@ -127,22 +128,19 @@ public class ConcordCaptain extends BaseHullMod implements GlobalTransientHullmo
                 installEffects.add(trackedHullmods.get(hullmod));
             }
         }
-
-        for (TrackedHullmodEffect effect : removeEffects) {
-            effect.onRemove(ship);
-        }
-        for (TrackedHullmodEffect effect : installEffects) {
-            effect.onInstall(ship);
-        }
         
+        boolean hasFighterMutator = false;
         for (String hullmod : ship.getVariant().getHullMods()) {
             HullModSpecAPI modSpec = Global.getSettings().getHullModSpec(hullmod);
-            if (!modSpec.hasTag(Codex.VOLATILE_EXCLUSIVE_PREFIX + Codex.TOPIC_FIGHTER_SPEC_CHANGE)) {
-                for (int i = 0; i < ship.getVariant().getWings().size(); i++) {
-                    String wingSpec = ship.getVariant().getWingId(i);
-                    if (wingSpec != null && ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.containsKey(wingSpec)) {
-                        ship.getVariant().setWingId(i, ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.get(wingSpec));
-                    }
+            if (modSpec.hasTag(Codex.VOLATILE_EXCLUSIVE_PREFIX + Codex.TOPIC_FIGHTER_SPEC_CHANGE)) {
+                hasFighterMutator = true;
+            }
+        }
+        if (!hasFighterMutator) {
+            for (int i = 0; i < ship.getVariant().getWings().size(); i++) {
+                String wingSpec = ship.getVariant().getWingId(i);
+                if (wingSpec != null && ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.containsKey(wingSpec)) {
+                    ship.getVariant().setWingId(i, ConcordDynamicInstanceAssembly.INJECTED_FIGHTER_TO_VANILLA.get(wingSpec));
                 }
             }
         }
@@ -159,6 +157,12 @@ public class ConcordCaptain extends BaseHullMod implements GlobalTransientHullmo
             }
         }
         
+        for (TrackedHullmodEffect effect : removeEffects) {
+            effect.onRemove(ship);
+        }
+        for (TrackedHullmodEffect effect : installEffects) {
+            effect.onInstall(ship);
+        }
     }
 
     @Override
