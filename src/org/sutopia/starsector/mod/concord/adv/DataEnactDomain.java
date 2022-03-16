@@ -12,9 +12,11 @@ import org.sutopia.starsector.mod.concord.phase.ConcordModStats;
 import org.sutopia.starsector.mod.concord.phase.PhaseCloakStatsForMod;
 
 import com.fs.starfarer.api.Global;
+import com.fs.starfarer.api.campaign.CampaignFleetAPI;
 import com.fs.starfarer.api.campaign.CampaignUIAPI.CoreUITradeMode;
 import com.fs.starfarer.api.campaign.econ.MarketAPI;
 import com.fs.starfarer.api.combat.HullModEffect;
+import com.fs.starfarer.api.combat.HullModFleetEffect;
 import com.fs.starfarer.api.combat.MutableShipStatsAPI;
 import com.fs.starfarer.api.combat.ShipAPI;
 import com.fs.starfarer.api.combat.ShipAPI.HullSize;
@@ -26,7 +28,7 @@ import com.fs.starfarer.api.ui.Alignment;
 import com.fs.starfarer.api.ui.TooltipMakerAPI;
 import com.fs.starfarer.api.util.Misc;
 
-public final class DataEnactDomain implements HullModEffect {
+public final class DataEnactDomain implements HullModEffect, HullModFleetEffect {
     // <id, effect>
     public static final HashMap<String, HullModEffect> sanctuary = new HashMap<>();
     // <topic, <leader, follower>>
@@ -278,6 +280,42 @@ public final class DataEnactDomain implements HullModEffect {
     @Override
     public int getDisplayCategoryIndex() {
         return sanctuary.get(getId()).getDisplayCategoryIndex();
+    }
+
+    @Override
+    public void advanceInCampaign(CampaignFleetAPI fleet) {
+        HullModEffect effect = sanctuary.get(getId());
+        if (effect instanceof HullModFleetEffect) {
+            ((HullModFleetEffect) effect).advanceInCampaign(fleet);
+        }
+        
+    }
+
+    @Override
+    public boolean withAdvanceInCampaign() {
+        HullModEffect effect = sanctuary.get(getId());
+        if (effect instanceof HullModFleetEffect) {
+            return ((HullModFleetEffect) effect).withAdvanceInCampaign();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean withOnFleetSync() {
+        HullModEffect effect = sanctuary.get(getId());
+        if (effect instanceof HullModFleetEffect) {
+            return ((HullModFleetEffect) effect).withOnFleetSync();
+        }
+        return false;
+    }
+
+    @Override
+    public void onFleetSync(CampaignFleetAPI fleet) {
+        HullModEffect effect = sanctuary.get(getId());
+        if (effect instanceof HullModFleetEffect) {
+            ((HullModFleetEffect) effect).onFleetSync(fleet);
+        }
+        
     }
 
 }

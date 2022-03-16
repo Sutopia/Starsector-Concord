@@ -121,10 +121,16 @@ public final class ConcordDynamicInstanceAssembly {
      * Inject hull spec (skin) on the fly and automatically add all necessary tags to prevent the spec from showing in codex
      * <p> It is highly recommended you do this onApplicationLoad() to prevent corrupted save
      */
+    /**
+     * @param id
+     * @param spec
+     */
     public static void injectShipSpecAsHidden(String id, MutableShipHullSpecAPI spec) {
         spec.getHints().add(ShipTypeHints.HIDE_IN_CODEX);
+        spec.getTags().clear();
         spec.addTag("no_drop");
         spec.addTag("no_bp_drop");
+        
         injectShipSpec(id, spec);
     }
     
