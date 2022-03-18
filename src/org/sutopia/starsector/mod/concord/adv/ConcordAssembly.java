@@ -74,30 +74,6 @@ public final class ConcordAssembly extends BaseModPlugin {
                     }
                 }
             }
-            // register tracked hullmods
-            if (spec.getEffect() instanceof TrackedHullmodEffect) {
-                ConcordCaptain.trackedHullmods.put(spec.getId(), (TrackedHullmodEffect) spec.getEffect());
-            } else if (spec.getEffect() instanceof OnInstallHullmodEffect) {
-                ConcordCaptain.trackedHullmods.put(spec.getId(), new TrackedHullmodEffect() {
-                    @Override
-                    public void onInstall(ShipAPI ship) {
-                        ((OnInstallHullmodEffect)spec.getEffect()).onInstall(ship);
-                    }
-                    @Override
-                    public void onRemove(ShipAPI ship) {
-                    }
-                });
-            } else if (spec.getEffect() instanceof OnRemoveHullmodEffect) {
-                ConcordCaptain.trackedHullmods.put(spec.getId(), new TrackedHullmodEffect() {
-                    @Override
-                    public void onInstall(ShipAPI ship) {
-                    }
-                    @Override
-                    public void onRemove(ShipAPI ship) {
-                        ((OnRemoveHullmodEffect)spec.getEffect()).onRemove(ship);
-                    }
-                });
-            }
         }
         
         // populate doppelganger
@@ -215,9 +191,34 @@ public final class ConcordAssembly extends BaseModPlugin {
 
     @Override
     public void onGameLoad(boolean newGame) {
-        for (HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
+        for (final HullModSpecAPI spec : Global.getSettings().getAllHullModSpecs()) {
             if (spec.getEffect() instanceof GlobalTransientHullmod) {
                 addHullmodEverywhere(spec.getId());
+            }
+            
+            // register tracked hullmods
+            if (spec.getEffect() instanceof TrackedHullmodEffect) {
+                ConcordCaptain.trackedHullmods.put(spec.getId(), (TrackedHullmodEffect) spec.getEffect());
+            } else if (spec.getEffect() instanceof OnInstallHullmodEffect) {
+                ConcordCaptain.trackedHullmods.put(spec.getId(), new TrackedHullmodEffect() {
+                    @Override
+                    public void onInstall(ShipAPI ship) {
+                        ((OnInstallHullmodEffect)spec.getEffect()).onInstall(ship);
+                    }
+                    @Override
+                    public void onRemove(ShipAPI ship) {
+                    }
+                });
+            } else if (spec.getEffect() instanceof OnRemoveHullmodEffect) {
+                ConcordCaptain.trackedHullmods.put(spec.getId(), new TrackedHullmodEffect() {
+                    @Override
+                    public void onInstall(ShipAPI ship) {
+                    }
+                    @Override
+                    public void onRemove(ShipAPI ship) {
+                        ((OnRemoveHullmodEffect)spec.getEffect()).onRemove(ship);
+                    }
+                });
             }
         }
         Global.getSector().addTransientListener(new ConcordCommander());
